@@ -1,0 +1,534 @@
+/* =========================================================================
+   ODC Harness Engineering — hoja de estilos base (16-bit retro)
+   Licencia del código CSS: MIT (LICENSE)
+   Licencia de fuentes tipográficas: OFL / Apache 2.0 (ver THIRD_PARTY.md)
+   Licencia del diseño visual / assets referenciados: CC BY 4.0 (LICENSE-CONTENT.txt)
+   ========================================================================= */
+
+/* ---------- Fonts (self-hosted, sin CDNs) ---------- */
+/* Coloca los WOFF2 en src/assets/fonts/ y descomenta:
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('@assets/fonts/PressStart2P.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'VT323';
+  src: url('@assets/fonts/VT323.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('@assets/fonts/Inter.woff2') format('woff2');
+  font-display: swap;
+}
+*/
+
+:root {
+  --c-bg-deep: #0b0e14;
+  --c-bg-panel: rgba(0, 0, 0, 0.55);
+  --c-bg-panel-2: rgba(15, 18, 28, 0.92);
+  --c-border: #2a3142;
+  --c-border-hi: #46c2ff;
+  --c-title: #ffc857;
+  --c-title-2: #ffb347;
+  --c-accent: #46c2ff;
+  --c-success: #6ee7a0;
+  --c-danger: #ff6b6b;
+  --c-gold: #ffd700;
+  --c-text: #e8ecf4;
+  --c-text-dim: #a9b4c4;
+
+  --font-pixel: 'Press Start 2P', 'VT323', 'Courier New', monospace;
+  --font-body: 'Inter', 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --radius: 2px;
+  --gap: 16px;
+  --shadow-title: 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
+  --bevel-btn: inset -2px -2px 0 rgba(0, 0, 0, 0.45), inset 2px 2px 0 rgba(255, 255, 255, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--c-bg-deep);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+}
+
+#app {
+  width: 100%;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at center, rgba(70, 194, 255, 0.06), transparent 60%),
+    var(--c-bg-deep);
+}
+
+#game-container {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  aspect-ratio: 16 / 9;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#game-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border: 2px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: 0 0 0 1px #000, 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Overlays DOM (teoría / quiz / HUD) ---------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px, 3vw, 32px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(1px);
+  z-index: 10;
+}
+
+.overlay.is-open {
+  display: flex;
+}
+
+/* ---------- Panels ---------- */
+.panel {
+  background: var(--c-bg-panel-2);
+  border: 2px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: clamp(16px, 2.5vw, 28px);
+  width: min(880px, 100%);
+  max-height: 90%;
+  overflow: auto;
+  box-shadow: 0 0 0 1px #000, 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.panel--compact {
+  width: min(520px, 100%);
+}
+
+.panel__title {
+  margin: 0 0 12px;
+  font-family: var(--font-pixel);
+  font-size: clamp(14px, 2.4vw, 22px);
+  color: var(--c-title);
+  text-shadow: var(--shadow-title);
+  letter-spacing: 1px;
+  line-height: 1.4;
+}
+
+.panel__subtitle {
+  margin: 0 0 16px;
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--c-accent);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.panel__body {
+  font-family: var(--font-body);
+  font-size: clamp(15px, 1.6vw, 18px);
+  color: var(--c-text);
+  line-height: 1.7;
+}
+
+.panel__body p {
+  margin: 0 0 14px;
+}
+
+.panel__body p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- Buttons (bisel retro) ---------- */
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 20px;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--c-text);
+  background: #1c2230;
+  border: 2px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--bevel-btn);
+  cursor: pointer;
+  user-select: none;
+  transition: transform 60ms linear, background 120ms linear;
+}
+
+.btn:hover {
+  background: #242c3d;
+  border-color: var(--c-border-hi);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.btn--primary {
+  background: linear-gradient(#3a4661, #263042);
+  border-color: var(--c-accent);
+  color: var(--c-gold);
+}
+
+.btn--primary:hover {
+  background: linear-gradient(#465473, #2c374d);
+}
+
+.btn--ghost {
+  background: transparent;
+}
+
+.btn[disabled],
+.btn.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* ---------- Chips / badges de estado ---------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: 1px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  background: #10151f;
+  color: var(--c-text-dim);
+  text-transform: uppercase;
+}
+
+.chip--ok {
+  color: var(--c-success);
+  border-color: var(--c-success);
+}
+
+.chip--lock {
+  color: var(--c-danger);
+  border-color: var(--c-danger);
+}
+
+.chip--wip {
+  color: var(--c-gold);
+  border-color: var(--c-gold);
+}
+
+/* ---------- Avatar / diálogo ---------- */
+.avatar {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.avatar__img {
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border: 2px solid var(--c-border);
+  background: #0d1119;
+  flex-shrink: 0;
+}
+
+.avatar__bubble {
+  position: relative;
+  flex: 1;
+  background: var(--c-bg-panel);
+  border: 2px solid var(--c-accent);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--c-text);
+}
+
+.avatar__bubble::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 22px;
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent var(--c-accent) transparent transparent;
+}
+
+/* ---------- Barra de progreso segmentada (estilo vida) ---------- */
+.progress {
+  display: flex;
+  gap: 3px;
+  margin: 12px 0;
+}
+
+.progress__seg {
+  flex: 1;
+  height: 12px;
+  background: #1a2030;
+  border: 1px solid var(--c-border);
+}
+
+.progress__seg.is-on {
+  background: linear-gradient(#6ee7a0, #34c985);
+  border-color: var(--c-success);
+}
+
+/* ---------- Texto destacado (dato clave) ---------- */
+.keyfact {
+  border-left: 4px solid var(--c-gold);
+  background: rgba(255, 215, 0, 0.08);
+  padding: 12px 16px;
+  margin: 16px 0;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--c-gold);
+}
+
+/* ---------- Glosario ---------- */
+.glossary {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.glossary li {
+  display: grid;
+  grid-template-columns: minmax(120px, 200px) 1fr;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--c-border-hi);
+  font-size: 14px;
+}
+
+.glossary dt,
+.glossary .term {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--c-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1.5;
+}
+
+/* ---------- Quiz ---------- */
+.quiz-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  min-height: 48px;
+  margin-bottom: 10px;
+  padding: 12px 16px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--c-text);
+  background: #141926;
+  border: 2px solid var(--c-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 120ms linear, background 120ms linear;
+}
+
+.quiz-option:hover {
+  border-color: var(--c-accent);
+  background: #1a2132;
+}
+
+.quiz-option:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+.quiz-option.is-correct {
+  border-color: var(--c-success);
+  background: rgba(110, 231, 160, 0.12);
+}
+
+.quiz-option.is-wrong {
+  border-color: var(--c-danger);
+  background: rgba(255, 107, 107, 0.12);
+}
+
+.quiz-option[disabled] {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.quiz-feedback {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--c-accent);
+  background: rgba(70, 194, 255, 0.08);
+  font-size: 15px;
+  color: var(--c-text);
+  display: none;
+}
+
+.quiz-feedback.is-open {
+  display: block;
+}
+
+.quiz-feedback.is-correct {
+  border-left-color: var(--c-success);
+  background: rgba(110, 231, 160, 0.1);
+}
+
+.quiz-feedback.is-wrong {
+  border-left-color: var(--c-danger);
+  background: rgba(255, 107, 107, 0.1);
+}
+
+/* ---------- Drag & drop ---------- */
+.dnd-lanes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.dnd-lane {
+  border: 2px dashed var(--c-border);
+  border-radius: var(--radius);
+  padding: 12px;
+  min-height: 160px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.dnd-lane.is-over {
+  border-color: var(--c-accent);
+  background: rgba(70, 194, 255, 0.08);
+}
+
+.dnd-lane__title {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--c-accent);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.dnd-item {
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: #1a2132;
+  border: 2px solid var(--c-border);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 14px;
+  cursor: grab;
+  user-select: none;
+}
+
+.dnd-item:active {
+  cursor: grabbing;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+  .panel {
+    max-height: 94%;
+    padding: 14px;
+  }
+
+  .avatar {
+    flex-direction: column;
+  }
+
+  .avatar__bubble::before {
+    display: none;
+  }
+
+  .glossary li {
+    grid-template-columns: 1fr;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .btn-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ---------- Accesibilidad: reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Utilidades ---------- */
+.u-hidden {
+  display: none !important;
+}
+
+.u-mono {
+  font-family: var(--font-pixel);
+  letter-spacing: 1px;
+}
+
+.u-dim {
+  color: var(--c-text-dim);
+}

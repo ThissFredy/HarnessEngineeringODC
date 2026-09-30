@@ -1,0 +1,55 @@
+# --- Dependencias ---
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
+
+# --- Build / dist ---
+dist/
+dist-ssr/
+build/
+.vite/
+*.tsbuildinfo
+
+# --- Paquetes SCORM exportados ---
+*.zip
+scorm-package/
+export/
+packages/
+
+# --- Logs ---
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- OS / Editor ---
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.swp
+*.swo
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# --- Env / secretos ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Cobertura / caches ---
+coverage/
+.nyc_output/
+.eslintcache
+.cache/
+.parcel-cache/
+
+# --- Temporales de agentes ---
+.opencode/cache/
