@@ -8,6 +8,8 @@ Este repositorio contiene el desarrollo de un **Objeto Digital de Conocimiento g
 
 Visual y mecánicamente, el ODC funciona como un **videojuego 2D clásico estilo *Super Mario Bros 3***: el estudiante navega un mapa *Overworld* para desbloquear niveles secuenciales que combinan **teoría** y **evaluación interactiva**.
 
+**Todo el ODC está construido con HTML, CSS y JavaScript puro (vanilla): sin frameworks, sin bundler y sin dependencias.** La razón de fondo: **SCORM 1.2 no exige nada más**, y sin capa de build el código fuente *es* el SCO — lo que se desarrolla es exactamente lo que el LMS sirve.
+
 ### 🎯 Resultado Esperado de Aprendizaje (REA)
 
 > Comprender la arquitectura de *Harness Engineering* para la implementación segura y escalable de agentes LLM en el ciclo vital de desarrollo de software (SDLC).
@@ -17,7 +19,47 @@ Visual y mecánicamente, el ODC funciona como un **videojuego 2D clásico estilo
 | **Población objetivo** | Estudiantes de Ingeniería de Sistemas y Computación · Especialización en Analítica y Ciencia de Datos |
 | **CADI** | Aplicaciones de Machine Learning |
 | **Metodología** | Exploración gamificada sobre mapa con 7 nodos temáticos |
-| **Evaluación** | Sumativa. Cada nodo cierra con un minijuego; el SCORM reporta el promedio final a Moodle |
+| **Evaluación** | Sumativa. Cada nodo cierra con un minijuego; el SCO reporta el promedio final (0–100) a Moodle vía `cmi.core.score.raw` |
+
+---
+
+## 🤔 ¿Por qué HTML/CSS/JS puro (y no un framework)?
+
+**Porque es el formato nativo de SCORM 1.2, y elimina toda fricción de empaquetado.**
+
+SCORM 1.2 no impone motor ni framework: solo exige que el contenido sea **HTML + JS + CSS** dentro de un `.zip`, con un `imsmanifest.xml` en la raíz y comunicación con el objeto `window.API` que expone el LMS (`LMSInitialize`, `LMSSetValue`, `LMSCommit`, `LMSFinish`).
+
+| Ventaja | Detalle |
+|---|---|
+| **Sin build** | No hay Vite/webpack/npm: el código fuente es el SCO. Dev = prod = LMS. |
+| **Sin dependencias** | Cero `node_modules`, cero licencias de terceros que auditar (solo fuentes tipográficas). |
+| **Sin fricción de rutas** | Sin bundler no hay `base` que configurar ni assets con hash: todas las referencias son relativas y auditables a simple vista. |
+| **Empaquetado trivial** | El `.zip` SCORM se arma con `zip` (CLI estándar) desde un script de shell. |
+| **Longevidad** | El SCO funcionará dentro del LMS hoy y en 10 años, al margen del ciclo de vida de cualquier framework. |
+
+**Reglas duras de compatibilidad SCORM (aplican a todo el código):**
+
+- ✅ Todas las rutas **relativas** (`./`, `../`). ❌ Jamás absolutas (`/assets/...`).
+- ✅ JavaScript clásico cargado con `<script defer src="...">` (sin módulos ES) — máxima compatibilidad, incluso abriendo `index.html` por `file://`.
+- ✅ Todo *self-contained*: fuentes, sprites y audios viven dentro del zip.
+- ❌ Ningún CDN, ningún servicio externo en producción (analytics, hotjar, etc.).
+
+---
+
+## 📦 Modelo de datos SCORM 1.2
+
+Cómo el ODC se comunica con el LMS (encapsulado en `js/scorm.js`, wrapper propio MIT):
+
+| Elemento / llamada | Uso en el ODC |
+|---|---|
+| `LMSInitialize` / `LMSFinish` | Conectar y desconectar el SCO del LMS. |
+| `cmi.core.lesson_status` | `incomplete` al iniciar → `completed` al superar los 7 nodos. |
+| `cmi.core.score.raw` | Promedio final de los 7 minijuegos (0–100). Moodle lo toma como calificación. |
+| `cmi.core.lesson_location` | Nodo actual, para reanudar la sesión donde quedó el estudiante. |
+| `cmi.suspend_data` | Estado de progreso detallado. ⚠️ SCORM 1.2 lo limita a **4096 caracteres**: guardar JSON minificado y compacto. |
+| `LMSCommit` | Persistencia periódica (al cerrar cada nodo/minijuego). |
+
+El wrapper busca el objeto `API` en `window`, `window.parent` y `window.opener` (cadena de iframes de Moodle). Si no hay LMS — modo desarrollo — entra en **fallback**: usa `localStorage` y loguea la traza SCORM en consola.
 
 ---
 
@@ -25,21 +67,20 @@ Visual y mecánicamente, el ODC funciona como un **videojuego 2D clásico estilo
 
 **El 100 % de las herramientas, librerías, fuentes y recursos multimedia de este proyecto deben ser OPEN SOURCE.** Esta restricción es de requisito del proyecto y no admite excepciones.
 
-| Herramienta / recurso | Licencia | Verificada |
+Al usar HTML/CSS/JS puro **no existe ninguna dependencia de código**; la auditoría se reduce a recursos:
+
+| Recurso | Licencia | Verificada |
 |---|---|---|
-| [Phaser 3](https://phaser.io) | MIT | ✅ |
-| [Vite](https://vitejs.dev) | MIT | ✅ |
-| [pnpm](https://pnpm.io) | MIT | ✅ |
-| [jszip](https://stuk.github.io/jszip/) | MIT (opción dual MIT/GPL) | ✅ |
 | [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) | SIL OFL 1.1 | ✅ |
 | [VT323](https://fonts.google.com/specimen/VT323) | SIL OFL 1.1 | ✅ |
 | [Inter](https://rsms.me/inter/) | SIL OFL 1.1 | ✅ |
 | [Roboto](https://fonts.google.com/specimen/Roboto) | Apache 2.0 | ✅ |
-| Wrapper SCORM 1.2 (`src/scorm/scorm.js`) | MIT (propio) | ✅ |
+| Wrapper SCORM 1.2 (`js/scorm.js`) | MIT (propio) | ✅ |
+| `zip` / `unzip` (empaquetado, herramienta de sistema) | Info-ZIP | ✅ |
 
 **Reglas duras:**
 - ❌ Ninguna librería comercial o cerrada.
-- ❌ Ninguna fuente servida por CDN externo (todo se sirve offline desde el zip SCORM).
+- ❌ Ninguna fuente servida por CDN externo: los `.woff2` se sirven **offline** desde el zip SCORM.
 - ❌ Ningún asset con copyright sin licencia libre (CC0 / CC-BY / dominio público).
 - ❌ Ningún servicio externo en producción (analytics, hotjar, etc.).
 - ✅ Todo asset generado con IA debe declararse como **CC BY 4.0** (licencia del proyecto) y registrarse en `THIRD_PARTY.md`.
@@ -52,9 +93,9 @@ El proyecto aplica **dos licencias** en función del tipo de artefacto. Esto es 
 
 | Componente | Licencia | Archivo | Notas |
 |---|---|---|---|
-| **Código fuente** (`src/`, `scripts/`, configs, `AGENTS.md`, `.opencode/`) | **MIT** | [`LICENSE`](./LICENSE) | Uso libre, incluso comercial, con atribución. |
+| **Código fuente** (HTML/CSS/JS del SCO, `scripts/`, configs) | **MIT** | [`LICENSE`](./LICENSE) | Uso libre, incluso comercial, con atribución. |
 | **Contenido educativo** (teoría de los 7 nodos, evaluaciones, textos de UI, guiones de audio, diagramas, sprites, audios, docs) | **CC BY 4.0** | [`LICENSE-CONTENT.txt`](./LICENSE-CONTENT.txt) | Requiere atribución. Permite usos comerciales y derivados. |
-| **Dependencias de terceros** (Phaser, Vite, jszip, pnpm, fuentes) | Ver tabla | [`THIRD_PARTY.md`](./THIRD_PARTY.md) | Conservan sus licencias originales. No se pueden relicenciar. |
+| **Recursos de terceros** (fuentes tipográficas) | Ver tabla | [`THIRD_PARTY.md`](./THIRD_PARTY.md) | Conservan sus licencias originales. No se pueden relicenciar. |
 
 **Atribución sugerida** al reutilizar el contenido:
 
@@ -68,39 +109,17 @@ El proyecto aplica **dos licencias** en función del tipo de artefacto. Esto es 
 
 ---
 
-## 🎮 ¿Phaser 3 puede exportarse a SCORM?
-
-**Sí, sin ninguna fricción.** SCORM 1.2 no impone motor ni framework: solo exige que el contenido sea **HTML + JS + CSS** dentro de un `.zip`, con un `imsmanifest.xml` en la raíz y comunicación con el objeto `window.API` que expone el LMS (`LMSInitialize`, `LMSSetValue`, `LMSCommit`, `LMSFinish`).
-
-Phaser 3 compila a un **bundle JS estándar** que corre en el navegador dentro del iframe de Moodle. El artefacto final se ve así:
-
-```
-ODC-HarnessEngineering-SCORM12-v0.1.0.zip
-├── imsmanifest.xml        ← raíz del zip (obligatorio)
-├── index.html             ← entry point del SCO
-├── assets/
-│   ├── main-abc123.js     ← bundle Phaser + juego
-│   ├── main-abc123.css
-│   └── …
-├── adlcp_rootv1p2.xsd     ← schemas (recomendables)
-├── imscp_rootv1p1p2.xsd
-└── …
-```
-
-Lo único que hay que cuidar en Vite es `base: './'` para que todos los assets se referencien con paths **relativos** (el LMS sirve el contenido desde una ruta arbitraria).
-
----
-
 ## 🛠️ Stack Tecnológico y Arquitectura
 
 | Capa | Tecnología | Notas |
 |---|---|---|
-| Motor / Frontend | **Phaser 3** | Mapa Overworld, sprites pixel-art, escenas |
-| UI / DOM | HTML5 + CSS3 + JS vanilla | Paneles de teoría, quiz, drag & drop |
-| Build | **Vite 6** | `base: './'`, sin code splitting de CSS |
-| Package manager | **pnpm** | `packageManager: pnpm@12.x` |
-| Empaquetado SCORM | **jszip** + `scripts/scorm-pack.mjs` | Genera `.zip` con `imsmanifest.xml` |
-| API SCORM 1.2 | `src/scorm/scorm.js` (custom MIT) | Wrapper ligero, sin dependencias |
+| Estructura | **HTML5** | `index.html` = entry point del SCO |
+| Presentación | **CSS3** (custom properties, grid/flex, media queries) | Estética 16-bit, responsive 360→1280 px |
+| Lógica | **JavaScript vanilla (ES6+)** | Sin frameworks, sin bundler, sin módulos ES |
+| Render del juego | DOM + CSS para paneles/quiz; `<canvas>` con JS vanilla para el mapa Overworld y sprites | Pixel art con `image-rendering: pixelated` |
+| API SCORM 1.2 | `js/scorm.js` (custom MIT) | Wrapper ligero, sin dependencias, fallback `localStorage` |
+| Empaquetado SCORM | `zip` (CLI) + `scripts/scorm-pack.sh` | Genera `.zip` con `imsmanifest.xml` en la raíz |
+| Validación | `scripts/validate-scorm.sh` | Checklist automático de compatibilidad |
 | Assets | PNG/JPG/OGG/MP3 ligeros | Generados con IA o propios, licencia libre |
 | Multimedia | Avatar 2D + audios con subtítulos | Clips ≤ 30 s |
 
@@ -136,108 +155,109 @@ Cada nodo = **vista de teoría (con avatar) + minijuego de evaluación**.
 
 ## 📁 Estructura del Proyecto
 
+*(Estructura objetivo; se construye por iteraciones.)*
+
 ```
 HarnessEngineeringODC/
-├── .opencode/                # agentes de opencode (UI, académico, SCORM-QA)
-├── docs/nodos/               # material maestro de contenido (Markdown)
-├── public/
-│   ├── index.html            # entry point
-│   └── scorm/                # imsmanifest.xml + schemas
+├── index.html               # entry point del SCO
+├── imsmanifest.xml          # manifest SCORM 1.2 (referencias relativas)
+├── css/
+│   └── main.css             # variables, tipografía, componentes retro
+├── js/
+│   ├── main.js              # bootstrap
+│   ├── scorm.js             # wrapper SCORM 1.2 (MIT propio)
+│   ├── data/
+│   │   └── nodos.js         # contenido de los 7 nodos
+│   └── ui/                  # overworld, paneles de teoría, minijuegos
+├── assets/
+│   ├── fonts/               # .woff2 locales (SIL OFL / Apache 2.0)
+│   ├── sprites/
+│   └── audio/
+├── scorm/                   # schemas XSD (se copian a la raíz del zip)
+├── docs/nodos/              # material maestro de contenido (NO se empaqueta)
 ├── scripts/
-│   ├── scorm-pack.mjs        # dist/ → .zip SCORM 1.2
-│   └── validate-scorm.mjs    # checklist automático
-├── src/
-│   ├── main.js               # bootstrap
-│   ├── scorm/scorm.js        # wrapper SCORM 1.2
-│   ├── styles/main.css       # variables, tipografía, componentes
-│   ├── assets/{fonts,sprites,audio}/
-│   └── game/
-│       ├── config.js
-│       ├── data/nodos.js
-│       ├── scenes/{Boot,Preload,Title,Overworld,Node}Scene.js
-│       └── scenes/components/
-├── AGENTS.md                 # instrucciones para agentes de IA
+│   ├── scorm-pack.sh        # arma el .zip SCORM 1.2
+│   └── validate-scorm.sh    # checklist automático
+├── .gitignore
 ├── README.md
-├── package.json
-└── vite.config.js            # base: './'  (OBLIGATORIO para SCORM)
+├── LICENSE                  # MIT (código)
+└── LICENSE-CONTENT.txt      # CC BY 4.0 (contenido educativo)
 ```
+
+> `docs/`, `scripts/`, `README.md` y las licencias **no** van dentro del zip: son archivos de trabajo del repositorio. El SCO es solo `index.html` + `imsmanifest.xml` + `css/` + `js/` + `assets/` + `scorm/`.
 
 ---
 
 ## 🚀 Inicio rápido
 
 ### Requisitos
-- **Node.js ≥ 20** (recomendado 26 LTS)
-- **pnpm ≥ 10** (`corepack enable && corepack prepare pnpm@latest --activate`)
+- Navegador moderno (Firefox / Chrome / Edge)
 - Git
+- `zip` (empaquetado; en Windows: 7-Zip o `Compress-Archive` de PowerShell)
+- Opcional: Python 3 (servidor local) y `xmllint` (validar manifest)
 
 ### Instalación
 
 ```bash
-git clone https://github.com/<tu-org>/HarnessEngineeringODC.git
+git clone https://github.com/ThissFredy/HarnessEngineeringODC.git
 cd HarnessEngineeringODC
-pnpm install
 ```
+
+No hay nada que instalar: **no existen dependencias**.
 
 ### Desarrollo
 
-```bash
-pnpm dev
-```
+Opción directa: abrir `index.html` en el navegador. Sin LMS, el wrapper SCORM entra en **modo fallback** (`localStorage` + traza en consola).
 
-Abre http://localhost:5173. En modo dev no hay LMS, así que `src/scorm/scorm.js` entra en **modo fallback** (usa `localStorage` y loguea en consola).
-
-### Build de producción
+Opción con servidor local (recomendada, simula mejor el iframe de Moodle):
 
 ```bash
-pnpm build
+python3 -m http.server 8000
 ```
 
-Genera `dist/` listo para servir con cualquier servidor estático.
+Abre http://localhost:8000.
 
-### Exportar paquete SCORM 1.2
+### Empaquetar SCORM 1.2
 
 ```bash
-pnpm scorm:pack
+bash scripts/scorm-pack.sh
 ```
 
-Genera `export/ODC-HarnessEngineering-SCORM12-v<version>.zip` listo para subir a Moodle.
+Genera `export/ODC-HarnessEngineering-SCORM12-v<versión>.zip` listo para subir a Moodle.
 
 ### Validar compatibilidad SCORM
 
 ```bash
-pnpm scorm:validate
+bash scripts/validate-scorm.sh
 ```
 
-Corre un checklist automático (manifest, entry point, llamadas a la API, paths relativos, ausencia de archivos prohibidos).
+Corre un checklist automático: manifest válido, entry point declarado, rutas relativas, cero referencias a CDN/servicios externos, estructura del zip.
 
 ### Pipeline completo (recomendado antes de cada entrega)
 
 ```bash
-pnpm export:check
+bash scripts/scorm-pack.sh && bash scripts/validate-scorm.sh
 ```
-
-Build + pack + validate en cadena. Ideal para ejecutar antes de cada commit o entrega al docente.
 
 ---
 
-## 🧠 Agentes de opencode (`.opencode/agent/`)
+## 📦 Artefacto SCORM final
 
-El proyecto incluye tres agentes especializados para acelerar el desarrollo con IA:
-
-| Agente | Responsabilidad | Cuándo invocarlo |
-|---|---|---|
-| **`ui-retro`** | Sistema visual 16-bit: paleta, tipografía *Press Start 2P*, layout del Overworld, HUD, sprites, accesibilidad. | Cualquier cambio CSS/HTML visual o de sprites. |
-| **`academico`** | Contenido de los 7 nodos, evaluaciones interactivas (quiz, drag & drop), taxonomía de Bloom, REA. | Redactar teoría, diseñar preguntas, revisar rigor. |
-| **`scorm-qa`** | Compatibilidad SCORM 1.2 / Moodle: `imsmanifest.xml`, wrapper API, `.zip`, licencias. | Cada iteración antes de subir a Moodle. |
-
-Se invocan con el Task tool de opencode. Ejemplo conceptual: «con `academico`, escribe el nodo 3» / «con `ui-retro`, ajusta el Overworld» / «con `scorm-qa`, valida el último `.zip`».
+```
+ODC-HarnessEngineering-SCORM12-v<versión>.zip
+├── imsmanifest.xml         # raíz del zip (obligatorio)
+├── index.html              # entry point del SCO
+├── css/  js/  assets/      # todo el juego, self-contained
+├── adlcp_rootv1p2.xsd      # schemas (recomendables)
+├── imscp_rootv1p1p2.xsd
+└── imsmd_rootv1p2p1.xsd
+```
 
 ---
 
 ## 📦 Configuración del entorno Moodle (futuro)
 
-El testeo real se hará con **Moodle local vía Docker**. Servicio pendiente de configurar en una iteración futura. Mientras tanto, se valida con el checklist de `scripts/validate-scorm.mjs` + SCORM Cloud gratuito.
+El testeo real se hará con **Moodle local vía Docker**. Servicio pendiente de configurar en una iteración futura. Mientras tanto, se valida con el checklist de `scripts/validate-scorm.sh` + SCORM Cloud gratuito.
 
 ---
 
@@ -247,4 +267,4 @@ El testeo real se hará con **Moodle local vía Docker**. Servicio pendiente de 
 
 - **Código fuente:** [MIT](./LICENSE) © 2026 Universidad de Cundinamarca — CADI Aplicaciones de Machine Learning.
 - **Contenido educativo, evaluaciones y assets:** [CC BY 4.0](./LICENSE-CONTENT.txt) © 2026 Universidad de Cundinamarca — CADI Aplicaciones de Machine Learning.
-- **Dependencias de terceros:** ver [`THIRD_PARTY.md`](./THIRD_PARTY.md).
+- **Recursos de terceros:** ver [`THIRD_PARTY.md`](./THIRD_PARTY.md).
