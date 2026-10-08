@@ -112,13 +112,8 @@
   <path fill="#50545a" d="M356 433h331v24H356z"/>
   <path fill="#c2a773" d="M356 427h331v6H356zm0 24h331v6H356z"/>
   <path fill="#f1cc68" d="M371 443h22v3h-22zm44 0h22v3h-22zm44 0h22v3h-22zm44 0h22v3h-22zm44 0h22v3h-22zm44 0h22v3h-22zm44 0h22v3h-22z"/>
-  <path fill="#323945" d="M596 357h32v70h-32zM596 463h32v33h-32z"/>
-  <path fill="#50545a" d="M602 357h20v70h-20zM602 463h20v33h-20z"/>
-  <path fill="#c2a773" d="M596 357h32v6h-32zm0 64h32v6h-32zM596 463h32v6h-32z"/>
-  <path fill="#f1cc68" d="M610 373h4v19h-4zm0 102h4v15h-4z"/>
   <use href="#car" x="523" y="430" color="#d9574f"/>
   <use href="#car" x="641" y="430" color="#f0b943"/>
-  <use href="#car" x="588" y="378" color="#50b2cc" transform="rotate(90 612 392)"/>
 
   <g>
     <use href="#tree" x="-30" y="377"/>
@@ -164,7 +159,6 @@
 
   <path d="M137 480h245c31 0 37-26 37-54v-69c0-39 18-59 57-59h160V198h56c39 0 55 22 55 58v89c0 43 23 70 65 70h26c31 0 43-20 43-49v-80c0-37 21-66 57-66h18" stroke="#583b30" stroke-width="42" stroke-linejoin="round"/>
   <path d="M137 480h245c31 0 37-26 37-54v-69c0-39 18-59 57-59h160V198h56c39 0 55 22 55 58v89c0 43 23 70 65 70h26c31 0 43-20 43-49v-80c0-37 21-66 57-66h18" stroke="#e9b879" stroke-width="29" stroke-linejoin="round"/>
-  <path d="M146 480h236m54-162h209m0-100v-10m53-10h56m-111 99v64m53 55h51m49-67v-41m22-57h25" stroke="#ffe1a5" stroke-width="4" stroke-dasharray="9 11" stroke-linecap="square"/>
 
   <g>
     <path fill="#7b482f" d="M766 426h98v64h-98z"/>
