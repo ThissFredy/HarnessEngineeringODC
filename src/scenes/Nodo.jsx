@@ -1,3 +1,3 @@
-export default function Nodo({ nodo }) {
+export default function Nodo() {
   return null
 }
