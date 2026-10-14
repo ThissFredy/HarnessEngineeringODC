@@ -3,10 +3,7 @@ import Stage from './components/Stage.jsx'
 import Scene from './scenes/Scene.jsx'
 import Inicio from './scenes/Inicio.jsx'
 import Mapa from './scenes/Mapa.jsx'
-import Nodo from './scenes/Nodo.jsx'
-import KaiAnimationReview from './scenes/KaiAnimationReview.jsx'
 import { SCENES } from './data/scenes.js'
-import { KAI_ANIMATIONS } from './data/kaiAnimations.js'
 import useStageViewport from './hooks/useStageViewport.js'
 import fontLicenseUrl from './assets/fonts/OFL-PressStart2P.txt?url'
 
@@ -65,13 +62,6 @@ export default function App() {
           <Scene key={scene.name} id={'scene-' + scene.name} active={scene.name === current} bg={scene.bg} imageRendering={scene.imageRendering}>
             {scene.type === 'inicio' && <Inicio onVamos={() => showSceneByName('mapa')} />}
             {scene.type === 'mapa' && <Mapa onSelectNode={showSceneByName} />}
-            {scene.type === 'nodo' && (scene.kaiReviewAction
-              ? <KaiAnimationReview
-                  action={KAI_ANIMATIONS[scene.kaiReviewAction]}
-                  active={scene.name === current}
-                  sceneNumber={scene.num + 2}
-                />
-              : <Nodo nodo={scene} />)}
           </Scene>
         ))}
       </Stage>
