@@ -34,18 +34,6 @@ export default function App() {
       if (e.key >= '1' && e.key <= '9') {
         const scene = SCENES[Number(e.key) - 1]
         if (scene) setCurrent(scene.name)
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault()
-        setCurrent((name) => {
-          const i = SCENES.findIndex((s) => s.name === name)
-          return SCENES[(i + 1) % SCENES.length].name
-        })
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault()
-        setCurrent((name) => {
-          const i = SCENES.findIndex((s) => s.name === name)
-          return SCENES[(i - 1 + SCENES.length) % SCENES.length].name
-        })
       } else if (e.key === '0') {
         resetView()
       }
@@ -61,7 +49,7 @@ export default function App() {
         {SCENES.map((scene) => (
           <Scene key={scene.name} id={'scene-' + scene.name} active={scene.name === current} bg={scene.bg} imageRendering={scene.imageRendering}>
             {scene.type === 'inicio' && <Inicio onVamos={() => showSceneByName('mapa')} />}
-            {scene.type === 'mapa' && <Mapa onSelectNode={showSceneByName} />}
+            {scene.type === 'mapa' && <Mapa active={scene.name === current} />}
           </Scene>
         ))}
       </Stage>

@@ -236,7 +236,7 @@ pnpm dev
 
 Dev server con HMR en http://localhost:5173. Sin LMS, el wrapper SCORM entra en **modo fallback** (`localStorage` + traza en consola).
 
-Navegación dev (invisible, se retira en producción): las teclas `1` y `2` cambian entre inicio y mapa, `←/→` ciclan, `0` o doble toque resetea el zoom.
+Navegación dev (invisible, se retira en producción): `1` y `2` cambian entre inicio y mapa; en el mapa, las flechas mueven el avatar por los caminos y `Espacio` se detecta al llegar a un nodo. `0` o doble toque resetea el zoom.
 
 ### Build (genera el SCO)
 
