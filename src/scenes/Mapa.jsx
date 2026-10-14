@@ -3,6 +3,8 @@ import Avatar from "../components/Avatar.jsx";
 import { KAI } from "../data/avatars.js";
 import { KAI_ANIMATIONS } from "../data/kaiAnimations.js";
 
+const KAI_WALK_ANIMATION = KAI_ANIMATIONS.caminar;
+
 const MAP_WIDTH = 1697;
 const MAP_HEIGHT = 927;
 const PATH_TOLERANCE = 27;
@@ -126,6 +128,7 @@ export default function Mapa({ active }) {
   const positionRef = useRef(INITIAL_POSITION);
   const [position, setPosition] = useState(INITIAL_POSITION);
   const [isMoving, setIsMoving] = useState(false);
+  const [walkingFrameIndex, setWalkingFrameIndex] = useState(0);
   const [spaceDetectedNode, setSpaceDetectedNode] = useState(null);
   const nearbyNode = useMemo(() => findNearbyNode(position), [position]);
 
@@ -245,12 +248,31 @@ export default function Mapa({ active }) {
     };
   }, [active]);
 
+  useEffect(() => {
+    if (
+      !isMoving ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setWalkingFrameIndex(0);
+      return undefined;
+    }
 
+    const timer = window.setInterval(() => {
+      setWalkingFrameIndex(
+        (index) => (index + 1) % KAI_WALK_ANIMATION.frames.length,
+      );
+    }, KAI_WALK_ANIMATION.frameDuration);
+
+    return () => window.clearInterval(timer);
+  }, [isMoving]);
 
   const avatarStyle = {
     left: `${(position.x / MAP_WIDTH) * 100}%`,
     top: `${(position.y / MAP_HEIGHT) * 100}%`,
   };
+  const walkingFrame = isMoving
+    ? KAI_WALK_ANIMATION.frames[walkingFrameIndex]
+    : null;
 
   return (
     <div className="absolute inset-0" aria-label="Nodos del mapa">
@@ -275,10 +297,32 @@ export default function Mapa({ active }) {
         style={avatarStyle}
       >
         <span className="absolute -bottom-[2px] left-1/2 z-0 h-[13px] w-[34px] -translate-x-1/2 rounded-full border-2 border-[#fff4cd] bg-[#20c3e8]/80 shadow-[0_0_0_3px_#203044,0_0_12px_#35d8ff]" />
-        <Avatar
-          avatar={KAI}
-          className={`map-avatar-highlight relative z-10 h-full w-full ${isMoving ? "avatar-walk" : "avatar-idle"}`}
-        />
+        <div
+          className={`map-avatar-highlight absolute inset-0 z-10 ${walkingFrame ? "" : "avatar-idle"}`}
+          style={
+            walkingFrame
+              ? {
+                  transform: walkingFrame.transform,
+                  transformOrigin: "center bottom",
+                }
+              : undefined
+          }
+        >
+          <Avatar
+            avatar={KAI}
+            alt={walkingFrame ? "KAI caminando" : KAI.name}
+            className="h-full w-full"
+          />
+          {walkingFrame && (
+            <img
+              src={walkingFrame.src}
+              alt=""
+              aria-hidden="true"
+              draggable={false}
+              className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain [image-rendering:pixelated]"
+            />
+          )}
+        </div>
       </div>
       {NODE_MARKERS.map(({ num, x, y }, index) => {
         const isNearby = nearbyNode?.num === num;
