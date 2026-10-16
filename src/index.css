@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: 'Press Start 2P';
-  src: url('./assets/fonts/PressStart2P-Regular.ttf') format('truetype');
+  font-family: "Press Start 2P";
+  src: url("./assets/fonts/PressStart2P-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -10,7 +10,7 @@
 
 @theme {
   --color-accent: #ffa822;
-  --font-pixel: 'Press Start 2P', monospace;
+  --font-pixel: "Press Start 2P", monospace;
 }
 
 html,
@@ -54,16 +54,50 @@ body {
 }
 
 .avatar-idle {
-  animation: avatar-idle 2.2s steps(2, end) infinite;
+  animation: avatar-idle 1.51s steps(2, end) infinite;
 }
 
 .map-avatar-highlight {
   filter: drop-shadow(0 0 2px #fff4cd) drop-shadow(0 0 5px #35d8ff);
 }
 
+@keyframes iris-close {
+  from {
+    clip-path: circle(150% at 50% 50%);
+  }
+
+  to {
+    clip-path: circle(0% at 50% 50%);
+  }
+}
+
+@keyframes iris-open {
+  from {
+    clip-path: circle(0% at 50% 50%);
+  }
+
+  to {
+    clip-path: circle(150% at 50% 50%);
+  }
+}
+
+.iris-close {
+  animation: iris-close 450ms ease-in both;
+}
+
+.iris-open {
+  animation: iris-open 450ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .map-node-float,
   .avatar-idle {
     animation: none;
+  }
+
+  .iris-close,
+  .iris-open {
+    animation-duration: 1ms;
+    animation-timing-function: linear;
   }
 }

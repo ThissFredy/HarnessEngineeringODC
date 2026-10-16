@@ -131,6 +131,7 @@ export default function useStageViewport(frameRef) {
     };
 
     const onPointerDown = (e) => {
+      if (e.target?.closest?.("[data-stage-interactive]")) return;
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       gesture = null;
       try {
@@ -149,6 +150,7 @@ export default function useStageViewport(frameRef) {
     };
 
     const releasePointer = (e) => {
+      if (!pointers.has(e.pointerId)) return;
       pointers.delete(e.pointerId);
       gesture = null;
       if (pointers.size === 0) {

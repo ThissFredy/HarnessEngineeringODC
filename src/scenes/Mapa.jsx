@@ -124,7 +124,12 @@ function moveOnPath(position, directionX, directionY, distance) {
   return isOnGuidedPath(nextPosition) ? nextPosition : position;
 }
 
-export default function Mapa({ active }) {
+export default function Mapa({
+  active,
+  enterableNodeNumbers = [],
+  nodeGrades = {},
+  onEnterNode,
+}) {
   const positionRef = useRef(INITIAL_POSITION);
   const [position, setPosition] = useState(INITIAL_POSITION);
   const [isMoving, setIsMoving] = useState(false);
@@ -217,7 +222,10 @@ export default function Mapa({ active }) {
         if (event.repeat) return;
 
         const node = findNearbyNode(positionRef.current);
-        if (node) setSpaceDetectedNode(node.num);
+        if (node) {
+          const enteredNode = onEnterNode?.(node.num);
+          if (!enteredNode) setSpaceDetectedNode(node.num);
+        }
       }
     };
 
@@ -246,7 +254,7 @@ export default function Mapa({ active }) {
       window.removeEventListener("blur", stopMoving);
       clearMovement();
     };
-  }, [active]);
+  }, [active, onEnterNode]);
 
   useEffect(() => {
     if (
@@ -271,14 +279,16 @@ export default function Mapa({ active }) {
     top: `${(position.y / MAP_HEIGHT) * 100}%`,
   };
   const walkingFrame = isMoving
-    ? KAI_WALK_ANIMATION.frames[walkingFrameIndex]
+    ? MUDEK_WALK_ANIMATION.frames[walkingFrameIndex]
     : null;
 
   return (
     <div className="absolute inset-0" aria-label="Nodos del mapa">
       <div className="absolute left-[12px] top-[12px] z-30 border-[3px] border-[#202b40] bg-[#17263aee] px-[9px] py-[7px] font-normal text-[7px] leading-[1.7] text-white shadow-[0_3px_0_#101725]">
         <span className="block">FLECHAS: MOVER</span>
-        <span className="block text-accent">ESPACIO: DETECTAR</span>
+        <span className="block text-accent">
+          ESPACIO: {enterableNodeNumbers.includes(nearbyNode?.num) ? "ENTRAR" : "DETECTAR"}
+        </span>
       </div>
       {nearbyNode && (
         <div
@@ -286,9 +296,16 @@ export default function Mapa({ active }) {
           aria-live="polite"
           className="absolute left-[12px] top-[61px] z-30 border-[3px] border-[#202b40] bg-[#17263aee] px-[9px] py-[7px] font-normal text-[7px] leading-[1.7] text-accent shadow-[0_3px_0_#101725]"
         >
-          {spaceDetectedNode === nearbyNode.num
-            ? `ESPACIO DETECTADO · NODO ${nearbyNode.num}`
-            : `NODO ${nearbyNode.num} · PULSA ESPACIO`}
+          <span className="block">
+            {spaceDetectedNode === nearbyNode.num
+              ? `ESPACIO DETECTADO · NODO ${nearbyNode.num}`
+              : `NODO ${nearbyNode.num} · PULSA ESPACIO`}
+          </span>
+          {enterableNodeNumbers.includes(nearbyNode.num) && (
+            <span className="mt-[4px] block text-white">
+              CALIFICACIÓN: {Number(nodeGrades[nearbyNode.num] ?? 0).toFixed(1)} / 5.0
+            </span>
+          )}
         </div>
       )}
 
