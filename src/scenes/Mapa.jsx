@@ -1,9 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Avatar from "../components/Avatar.jsx";
 import { MUDEK } from "../data/avatars.js";
 import { MUDEK_ANIMATIONS } from "../data/mudekAnimations.js";
+import mapOneAudio from "../assets/audio/Map-1.mp3";
+import mapTwoAudio from "../assets/audio/Map-2.mp3";
 
 const MUDEK_WALK_ANIMATION = MUDEK_ANIMATIONS.caminar;
+const MUDEK_TALK_ANIMATION = MUDEK_ANIMATIONS.hablar;
+const MAP_DIALOGUE_MESSAGES = [
+  "En respuesta a este cambio, es importante entender un marco metodológico mucho más robusto: el Harness Engineering. Acompáñame a recorrer este mapa para descubrir sus estrategias y patrones arquitectónicos.",
+  "En cada parada, te revelaré los hallazgos clave para comprender este paradigma. Deberás prestar atención y superar un pequeño reto interactivo para desbloquear el siguiente camino y obtener tu calificación final.\n\n¿Todo listo?\n\n¡Usa las flechas de tu teclado, y dirígete al primer nivel para comenzar!",
+];
 
 const MAP_WIDTH = 1697;
 const MAP_HEIGHT = 927;
@@ -134,11 +141,169 @@ export default function Mapa({
   const [position, setPosition] = useState(INITIAL_POSITION);
   const [isMoving, setIsMoving] = useState(false);
   const [walkingFrameIndex, setWalkingFrameIndex] = useState(0);
+  const [mapDialogueIndex, setMapDialogueIndex] = useState(0);
+  const [mapDialogueComplete, setMapDialogueComplete] = useState(false);
+  const [mapTypingState, setMapTypingState] = useState({
+    messageIndex: -1,
+    visibleCharacters: 0,
+  });
+  const [talkingFrameIndex, setTalkingFrameIndex] = useState(0);
+  const mapOneAudioRef = useRef(null);
+  const mapTwoAudioRef = useRef(null);
   const [spaceDetectedNode, setSpaceDetectedNode] = useState(null);
+  const currentMapMessage = MAP_DIALOGUE_MESSAGES[mapDialogueIndex];
+  const mapVisibleCharacters =
+    mapTypingState.messageIndex === mapDialogueIndex
+      ? mapTypingState.visibleCharacters
+      : 0;
+  const isMapDialogueTyping =
+    !mapDialogueComplete && mapVisibleCharacters < currentMapMessage.length;
+  const mapVisibleText = currentMapMessage.slice(0, mapVisibleCharacters);
+  const isLastMapMessage = mapDialogueIndex === MAP_DIALOGUE_MESSAGES.length - 1;
+  const canExplore = active && mapDialogueComplete;
   const nearbyNode = useMemo(() => findNearbyNode(position), [position]);
 
+  const finishMapDialogueTyping = useCallback(() => {
+    if (!isMapDialogueTyping) return;
+
+    const audio =
+      mapDialogueIndex === 0
+        ? mapOneAudioRef.current
+        : mapDialogueIndex === 1
+          ? mapTwoAudioRef.current
+          : null;
+    audio?.pause();
+    if (audio) audio.currentTime = 0;
+
+    setMapTypingState({
+      messageIndex: mapDialogueIndex,
+      visibleCharacters: currentMapMessage.length,
+    });
+  }, [currentMapMessage, isMapDialogueTyping, mapDialogueIndex]);
+
+  const advanceMapDialogue = useCallback(() => {
+    if (!active || mapDialogueComplete) return;
+    if (isMapDialogueTyping) {
+      finishMapDialogueTyping();
+      return;
+    }
+
+    if (mapDialogueIndex + 1 === MAP_DIALOGUE_MESSAGES.length) {
+      setMapDialogueComplete(true);
+    } else {
+      setMapDialogueIndex((index) => index + 1);
+    }
+  }, [
+    active,
+    finishMapDialogueTyping,
+    isMapDialogueTyping,
+    mapDialogueComplete,
+    mapDialogueIndex,
+  ]);
+
   useEffect(() => {
-    if (!active) {
+    const audio = !active || mapDialogueComplete
+      ? null
+      : mapDialogueIndex === 0
+        ? mapOneAudioRef.current
+        : mapDialogueIndex === 1
+          ? mapTwoAudioRef.current
+          : null;
+
+    [mapOneAudioRef, mapTwoAudioRef].forEach((audioRef) => {
+      if (audioRef.current !== audio) {
+        audioRef.current?.pause();
+        if (audioRef.current) audioRef.current.currentTime = 0;
+      }
+    });
+
+    if (!audio) return undefined;
+
+    audio.currentTime = 0;
+    const playback = audio.play();
+    playback?.catch(() => {
+      // Playback can be blocked by the browser's autoplay policy.
+    });
+
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, [active, mapDialogueComplete, mapDialogueIndex]);
+
+  useEffect(() => {
+    if (!active || mapDialogueComplete || !isMapDialogueTyping) return undefined;
+
+    const previousCharacter = currentMapMessage[mapVisibleCharacters - 1];
+    const delay = /[.!?,;:]/.test(previousCharacter ?? "") ? 110 : 50;
+    const timer = window.setTimeout(() => {
+      setMapTypingState((current) => {
+        const currentCharacters =
+          current.messageIndex === mapDialogueIndex ? current.visibleCharacters : 0;
+        return {
+          messageIndex: mapDialogueIndex,
+          visibleCharacters: Math.min(
+            currentCharacters + 1,
+            currentMapMessage.length,
+          ),
+        };
+      });
+    }, delay);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    active,
+    currentMapMessage,
+    isMapDialogueTyping,
+    mapDialogueComplete,
+    mapDialogueIndex,
+    mapVisibleCharacters,
+  ]);
+
+  useEffect(() => {
+    if (
+      !active ||
+      mapDialogueComplete ||
+      !isMapDialogueTyping ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setTalkingFrameIndex(0);
+      return undefined;
+    }
+
+    const timer = window.setInterval(() => {
+      setTalkingFrameIndex(
+        (index) => (index + 1) % MUDEK_TALK_ANIMATION.frames.length,
+      );
+    }, MUDEK_TALK_ANIMATION.frameDuration);
+
+    return () => window.clearInterval(timer);
+  }, [active, isMapDialogueTyping, mapDialogueComplete]);
+
+  useEffect(() => {
+    if (!active || mapDialogueComplete) return undefined;
+
+    const onKeyDown = (event) => {
+      if (event.defaultPrevented || event.repeat) return;
+      if (event.code !== "Space" && event.key !== " ") return;
+      if (
+        event.target?.closest?.(
+          "[data-map-welcome-dialogue], a, input, textarea, select",
+        )
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      advanceMapDialogue();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [active, advanceMapDialogue, mapDialogueComplete]);
+
+  useEffect(() => {
+    if (!canExplore) {
       setIsMoving(false);
       setSpaceDetectedNode(null);
       return undefined;
@@ -254,7 +419,7 @@ export default function Mapa({
       window.removeEventListener("blur", stopMoving);
       clearMovement();
     };
-  }, [active, onEnterNode]);
+  }, [canExplore, onEnterNode]);
 
   useEffect(() => {
     if (
@@ -278,35 +443,47 @@ export default function Mapa({
     left: `${(position.x / MAP_WIDTH) * 100}%`,
     top: `${(position.y / MAP_HEIGHT) * 100}%`,
   };
-  const walkingFrame = isMoving
+  const isAvatarTalking = active && !mapDialogueComplete && isMapDialogueTyping;
+  const talkingFrame = isAvatarTalking
+    ? MUDEK_TALK_ANIMATION.frames[talkingFrameIndex]
+    : null;
+  const walkingFrame = canExplore && isMoving
     ? MUDEK_WALK_ANIMATION.frames[walkingFrameIndex]
     : null;
+  const avatarFrame = talkingFrame ?? walkingFrame;
 
   return (
     <div className="absolute inset-0" aria-label="Nodos del mapa">
-      <div className="absolute left-[12px] top-[12px] z-30 border-[3px] border-[#202b40] bg-[#17263aee] px-[9px] py-[7px] font-normal text-[7px] leading-[1.7] text-white shadow-[0_3px_0_#101725]">
-        <span className="block">FLECHAS: MOVER</span>
-        <span className="block text-accent">
-          ESPACIO: {enterableNodeNumbers.includes(nearbyNode?.num) ? "ENTRAR" : "DETECTAR"}
-        </span>
-      </div>
-      {nearbyNode && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="absolute left-[12px] top-[61px] z-30 border-[3px] border-[#202b40] bg-[#17263aee] px-[9px] py-[7px] font-normal text-[7px] leading-[1.7] text-accent shadow-[0_3px_0_#101725]"
-        >
-          <span className="block">
-            {spaceDetectedNode === nearbyNode.num
-              ? `ESPACIO DETECTADO · NODO ${nearbyNode.num}`
-              : `NODO ${nearbyNode.num} · PULSA ESPACIO`}
-          </span>
-          {enterableNodeNumbers.includes(nearbyNode.num) && (
-            <span className="mt-[4px] block text-white">
-              CALIFICACIÓN: {Number(nodeGrades[nearbyNode.num] ?? 0).toFixed(1)} / 5.0
+      <audio ref={mapOneAudioRef} src={mapOneAudio} preload="auto" />
+      <audio ref={mapTwoAudioRef} src={mapTwoAudio} preload="auto" />
+
+      {mapDialogueComplete && (
+        <>
+          <div className="absolute left-[12px] top-[12px] z-30 border-[3px] border-[#202b40] bg-[#17263aee] px-[9px] py-[7px] font-normal text-[7px] leading-[1.7] text-white shadow-[0_3px_0_#101725]">
+            <span className="block">FLECHAS: MOVER</span>
+            <span className="block text-accent">
+              ESPACIO: {enterableNodeNumbers.includes(nearbyNode?.num) ? "ENTRAR" : "DETECTAR"}
             </span>
+          </div>
+          {nearbyNode && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="absolute left-[12px] top-[61px] z-30 border-[3px] border-[#202b40] bg-[#17263aee] px-[9px] py-[7px] font-normal text-[7px] leading-[1.7] text-accent shadow-[0_3px_0_#101725]"
+            >
+              <span className="block">
+                {spaceDetectedNode === nearbyNode.num
+                  ? `ESPACIO DETECTADO · NODO ${nearbyNode.num}`
+                  : `NODO ${nearbyNode.num} · PULSA ESPACIO`}
+              </span>
+              {enterableNodeNumbers.includes(nearbyNode.num) && (
+                <span className="mt-[4px] block text-white">
+                  CALIFICACIÓN: {Number(nodeGrades[nearbyNode.num] ?? 0).toFixed(1)} / 5.0
+                </span>
+              )}
+            </div>
           )}
-        </div>
+        </>
       )}
 
       <div
@@ -315,11 +492,11 @@ export default function Mapa({
       >
         <span className="absolute -bottom-[2px] left-1/2 z-0 h-[13px] w-[34px] -translate-x-1/2 rounded-full border-2 border-[#fff4cd] bg-[#20c3e8]/80 shadow-[0_0_0_3px_#203044,0_0_12px_#35d8ff]" />
         <div
-          className={`map-avatar-highlight absolute inset-0 z-10 ${walkingFrame ? "" : "avatar-idle"}`}
+          className={`map-avatar-highlight absolute inset-0 z-10 ${avatarFrame ? "" : "avatar-idle"}`}
           style={
-            walkingFrame
+            avatarFrame
               ? {
-                  transform: walkingFrame.transform,
+                  transform: avatarFrame.transform,
                   transformOrigin: "center bottom",
                 }
               : undefined
@@ -327,12 +504,12 @@ export default function Mapa({
         >
           <Avatar
             avatar={MUDEK}
-            alt={walkingFrame ? "MUDEK caminando" : MUDEK.name}
+            alt={isAvatarTalking ? "MUDEK hablando" : walkingFrame ? "MUDEK caminando" : MUDEK.name}
             className="h-full w-full"
           />
-          {walkingFrame && (
+          {avatarFrame && (
             <img
-              src={walkingFrame.src}
+              src={avatarFrame.src}
               alt=""
               aria-hidden="true"
               draggable={false}
@@ -341,6 +518,56 @@ export default function Mapa({
           )}
         </div>
       </div>
+
+      {!mapDialogueComplete && (
+        <button
+          type="button"
+          data-stage-interactive
+          data-map-welcome-dialogue
+          onClick={advanceMapDialogue}
+          className="absolute left-[24px] right-[24px] top-[18px] z-30 flex max-h-[280px] cursor-pointer flex-col gap-[8px] border-[5px] border-[#f0ca63] bg-[#101725] px-[15px] py-[10px] text-left text-white shadow-[0_8px_0_#080d16,0_12px_24px_#000000b8] ring-4 ring-[#35d8ff]/80 transition-colors hover:border-[#fff3bd] active:translate-y-[3px] active:shadow-[0_5px_0_#080d16,0_9px_18px_#000000b8] focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-white"
+        >
+          <span className="flex w-full items-center justify-between gap-[8px] border-b-2 border-[#40566d] pb-[6px] font-pixel text-[7px] leading-[1.7]">
+            <span className="flex items-center gap-[9px]">
+              <span className="border-2 border-[#101725] bg-[#35d8ff] px-[7px] py-[4px] text-[#101725] shadow-[2px_2px_0_#14768b]">
+                MUDEK
+              </span>
+              <span className="text-[#9fe8f4]">BIENVENIDA AL MAPA</span>
+            </span>
+            <span className="shrink-0 border-2 border-[#7a5c2e] bg-[#f0ca63] px-[7px] py-[4px] text-[#211922] shadow-[2px_2px_0_#080d16]">
+              {String(mapDialogueIndex + 1).padStart(2, "0")} / 02
+            </span>
+          </span>
+
+          <span className="block w-full whitespace-pre-line border-l-[4px] border-[#35d8ff] px-[11px] py-[7px] font-pixel text-[8px] leading-[1.9] text-white [text-shadow:1px_1px_0_#080d16]">
+            {mapVisibleText}
+            {isMapDialogueTyping && <span className="ml-[2px] text-[#f0ca63]">▌</span>}
+          </span>
+
+          <span className="flex w-full items-center justify-between gap-[8px] border-t-2 border-[#40566d] pt-[6px] font-pixel text-[7px] leading-[1.7]">
+            <span className={isMapDialogueTyping ? "text-[#9fe8f4]" : "text-[#ffe6b8]"}>
+              {isMapDialogueTyping
+                ? "ESPACIO O CLIC: MOSTRAR TODO"
+                : isLastMapMessage
+                  ? "ESPACIO O CLIC: COMENZAR"
+                  : "ESPACIO O CLIC: CONTINUAR"}
+            </span>
+            <span aria-hidden="true" className="shrink-0 text-[#f0ca63]">
+              ▼
+            </span>
+          </span>
+
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-[15px] left-[82px] h-0 w-0 border-x-[12px] border-x-transparent border-t-[15px] border-t-[#f0ca63]"
+          />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-[10px] left-[86px] h-0 w-0 border-x-[8px] border-x-transparent border-t-[10px] border-t-[#101725]"
+          />
+        </button>
+      )}
+
       {NODE_MARKERS.map(({ num, x, y }, index) => {
         const isNearby = nearbyNode?.num === num;
 

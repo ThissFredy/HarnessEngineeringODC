@@ -29,6 +29,7 @@ Al crear o modificar globos de diálogo, mensajes de éxito o paneles de evaluac
 - Muestra el cuerpo del mensaje con efecto de escritura progresiva, no todo de una vez. Mientras se escribe, MUDEK usa la animación `MUDEK_ANIMATIONS.hablar` de `src/data/mudekAnimations.js` y sus fotogramas `hablar-01/02/03.svg` como capas sobre el sprite base.
 - Al terminar de escribir, detén el ciclo de habla y devuelve a MUDEK a su estado idle.
 - Durante la escritura, el primer **Espacio o clic** completa el mensaje actual; un segundo **Espacio o clic** avanza al siguiente globo o sección. Mantén este comportamiento también en mensajes finales que deban leerse antes de continuar.
+- Si el globo tiene audio, al completar de golpe la escritura con el primer **Espacio o clic**, detén ese audio y no lo reanudes mientras el globo siga visible. Al avanzar o salir de la escena, detén también el audio asociado.
 - Respeta `prefers-reduced-motion`: no cicles los fotogramas de habla cuando el usuario solicite movimiento reducido.
 
 Usa `src/scenes/Nodo.jsx` como referencia visual y funcional para diálogos, escritura y evaluación; usa `src/data/mudekAnimations.js` como fuente de las animaciones del personaje.

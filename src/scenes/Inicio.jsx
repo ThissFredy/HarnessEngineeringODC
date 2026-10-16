@@ -59,6 +59,7 @@ export default function Inicio({ onVamos }) {
       <button
         id="btn-vamos"
         type="button"
+        data-stage-interactive
         onClick={onVamos}
         className="absolute bottom-[22px] left-1/2 -translate-x-1/2 cursor-pointer border-4 border-[#241923] bg-accent px-[32px] py-[16px] font-pixel text-[22px] leading-none text-black shadow-[0_6px_0_#100d15] transition-colors hover:bg-[#ffc35c] active:translate-y-[4px] active:shadow-[0_2px_0_#100d15] focus-visible:outline-4 focus-visible:outline-offset-[3px] focus-visible:outline-white"
       >

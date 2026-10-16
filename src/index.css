@@ -89,6 +89,34 @@ body {
   animation: iris-open 450ms ease-out both;
 }
 
+@keyframes curtain-close {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes curtain-open {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+.curtain-closing {
+  animation: curtain-close 500ms ease-in both;
+}
+
+.curtain-opening {
+  animation: curtain-open 500ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .map-node-float,
   .avatar-idle {
@@ -96,7 +124,9 @@ body {
   }
 
   .iris-close,
-  .iris-open {
+  .iris-open,
+  .curtain-closing,
+  .curtain-opening {
     animation-duration: 1ms;
     animation-timing-function: linear;
   }

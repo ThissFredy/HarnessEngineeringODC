@@ -3,6 +3,7 @@ import { flushSync } from 'react-dom'
 import Stage from './components/Stage.jsx'
 import Scene from './scenes/Scene.jsx'
 import Inicio from './scenes/Inicio.jsx'
+import IntroduccionMudek from './scenes/IntroduccionMudek.jsx'
 import Mapa from './scenes/Mapa.jsx'
 import Nodo from './scenes/Nodo.jsx'
 import { SCENES } from './data/scenes.js'
@@ -42,16 +43,30 @@ export default function App() {
   const frameRef = useRef(null)
   const [current, setCurrent] = useState('inicio')
   const [irisTransition, setIrisTransition] = useState(null)
+  const [curtainTransition, setCurtainTransition] = useState(null)
   const [nodeGrades, setNodeGrades] = useState(readNodeGrades)
   const nodeGradesRef = useRef(nodeGrades)
   const { transform, resetView } = useStageViewport(frameRef)
 
   const navigateToScene = useCallback((name) => {
     const targetScene = SCENES.find((scene) => scene.name === name)
-    if (!targetScene || irisTransition || name === current) return false
+    if (!targetScene || irisTransition || curtainTransition || name === current) return false
 
     const currentScene = SCENES.find((scene) => scene.name === current)
-    if (targetScene.type === 'nodo' || currentScene?.type === 'nodo') {
+    const enteringMapFromIntroduction =
+      currentScene?.type === 'introduccion' && targetScene.type === 'mapa'
+    const openingIntroductionCurtain =
+      currentScene?.type === 'inicio' && targetScene.type === 'introduccion'
+
+    if (openingIntroductionCurtain) {
+      flushSync(() => {
+        setCurtainTransition({ from: current, to: name, phase: 'closing' })
+      })
+    } else if (
+      targetScene.type === 'nodo' ||
+      currentScene?.type === 'nodo' ||
+      enteringMapFromIntroduction
+    ) {
       flushSync(() => {
         setIrisTransition({ from: current, to: name, phase: 'closing' })
       })
@@ -60,7 +75,7 @@ export default function App() {
     }
 
     return true
-  }, [current, irisTransition])
+  }, [current, curtainTransition, irisTransition])
 
   const handleEnterNode = useCallback((nodeNumber) => {
     const nodeScene = SCENES.find(
@@ -95,6 +110,17 @@ export default function App() {
     }
   }, [irisTransition])
 
+  const handleCurtainAnimationEnd = useCallback(() => {
+    if (!curtainTransition) return
+
+    if (curtainTransition.phase === 'closing') {
+      setCurrent(curtainTransition.to)
+      setCurtainTransition({ ...curtainTransition, phase: 'opening' })
+    } else if (curtainTransition.phase === 'opening') {
+      setCurtainTransition(null)
+    }
+  }, [curtainTransition])
+
   useEffect(() => {
     window.ODC = {
       scenes: SCENES.map((s) => s.name),
@@ -123,7 +149,10 @@ export default function App() {
   return (
     <div ref={frameRef} id="frame" className="fixed inset-0 touch-none overflow-hidden bg-black">
       <link rel="license" href={fontLicenseUrl} />
-      <Stage transform={transform} transitioning={Boolean(irisTransition)}>
+      <Stage
+        transform={transform}
+        transitioning={Boolean(irisTransition || curtainTransition)}
+      >
         {SCENES.map((scene) => {
           const active = scene.name === current
           const irisPhase =
@@ -140,10 +169,19 @@ export default function App() {
               active={active}
               bg={scene.bg}
               imageRendering={scene.imageRendering}
+              backgroundBrightness={scene.backgroundBrightness}
               irisPhase={irisPhase}
               onIrisAnimationEnd={() => handleIrisAnimationEnd(scene.name)}
             >
-              {scene.type === 'inicio' && <Inicio onVamos={() => navigateToScene('mapa')} />}
+              {scene.type === 'inicio' && (
+                <Inicio onVamos={() => navigateToScene('introduccion-mudek')} />
+              )}
+              {scene.type === 'introduccion' && (
+                <IntroduccionMudek
+                  active={active}
+                  onComplete={() => navigateToScene('mapa')}
+                />
+              )}
               {scene.type === 'mapa' && (
                 <Mapa
                   active={active && !irisTransition}
@@ -163,6 +201,16 @@ export default function App() {
             </Scene>
           )
         })}
+        {curtainTransition && (
+          <div
+            aria-hidden="true"
+            data-stage-interactive
+            className={`absolute inset-0 z-[100] bg-black curtain-${curtainTransition.phase}`}
+            onAnimationEnd={(event) => {
+              if (event.target === event.currentTarget) handleCurtainAnimationEnd()
+            }}
+          />
+        )}
       </Stage>
     </div>
   )

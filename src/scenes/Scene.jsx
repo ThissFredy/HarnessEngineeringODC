@@ -3,6 +3,7 @@ export default function Scene({
   active,
   bg,
   imageRendering = 'pixelated',
+  backgroundBrightness = 1,
   irisPhase,
   onIrisAnimationEnd,
   children,
@@ -22,7 +23,10 @@ export default function Scene({
         src={bg}
         alt=""
         draggable={false}
-        style={{ imageRendering }}
+        style={{
+          imageRendering,
+          filter: backgroundBrightness === 1 ? undefined : `brightness(${backgroundBrightness})`,
+        }}
       />
       <div className="absolute inset-0">{children}</div>
     </section>

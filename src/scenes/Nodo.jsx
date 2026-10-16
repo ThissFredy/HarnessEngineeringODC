@@ -8,9 +8,18 @@ import {
   NODE_1_QUIZ_OPTIONS,
 } from "../data/nodo1.js";
 import { MUDEK_ANIMATIONS } from "../data/mudekAnimations.js";
+import nodeOneFirstAudio from "../assets/audio/Nodo-1-1.mp3";
+import nodeOneSecondAudio from "../assets/audio/Nodo-1-2.mp3";
+import nodeOneThirdAudio from "../assets/audio/Nodo-1-3.mp3";
+import nodeOneFourthAudio from "../assets/audio/Nodo-1-4.mp3";
+import nodeOneFifthAudio from "../assets/audio/Nodo-1-5.mp3";
+import nodeOneSixthAudio from "../assets/audio/Nodo-1-6.mp3";
+import nodeOneSeventhAudio from "../assets/audio/Nodo-1-7.mp3";
+import nodeOneQuizAudio from "../assets/audio/Nodo-1-8.mp3";
+import nodeOneSuccessAudio from "../assets/audio/Nodo-1-9.mp3";
 
 const PASSING_GRADE = 5.0;
-const TYPEWRITER_CHARACTER_DELAY = 18;
+const TYPEWRITER_CHARACTER_DELAY = 50;
 const TYPEWRITER_PAUSE_DELAY = 110;
 const STAGE_WIDTH = 1024;
 const STAGE_HEIGHT = 599;
@@ -47,8 +56,22 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
   const [draggedOptionId, setDraggedOptionId] = useState(null);
   const [hoveredOptionId, setHoveredOptionId] = useState(null);
   const [dragPreview, setDragPreview] = useState(null);
-  const [typingState, setTypingState] = useState({ key: "", visibleCharacters: 0 });
+  const [typingState, setTypingState] = useState({
+    key: "",
+    visibleCharacters: 0,
+  });
   const [talkingFrameIndex, setTalkingFrameIndex] = useState(0);
+  const [isQuizAudioPlaying, setIsQuizAudioPlaying] = useState(false);
+  const [isSuccessAudioPlaying, setIsSuccessAudioPlaying] = useState(false);
+  const nodeOneFirstAudioRef = useRef(null);
+  const nodeOneSecondAudioRef = useRef(null);
+  const nodeOneThirdAudioRef = useRef(null);
+  const nodeOneFourthAudioRef = useRef(null);
+  const nodeOneFifthAudioRef = useRef(null);
+  const nodeOneSixthAudioRef = useRef(null);
+  const nodeOneSeventhAudioRef = useRef(null);
+  const nodeOneQuizAudioRef = useRef(null);
+  const nodeOneSuccessAudioRef = useRef(null);
   const dragRef = useRef(null);
   const currentMessage = NODE_1_DIALOGUE[dialogueIndex];
   const typewriterKey =
@@ -69,15 +92,49 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
         : "";
   const visibleCharacters =
     typingState.key === typewriterKey ? typingState.visibleCharacters : 0;
-  const isTyping = Boolean(typewriterText) && visibleCharacters < typewriterText.length;
+  const isTyping =
+    Boolean(typewriterText) && visibleCharacters < typewriterText.length;
+  const isSpeaking =
+    isTyping ||
+    (phase === "quiz" && isQuizAudioPlaying) ||
+    (phase === "success" && isSuccessAudioPlaying);
   const visibleText = typewriterText.slice(0, visibleCharacters);
   const talkingAnimation = MUDEK_ANIMATIONS.hablar;
   const talkingFrame = talkingAnimation.frames[talkingFrameIndex];
 
   const finishTyping = useCallback(() => {
     if (!typewriterText || !isTyping) return;
-    setTypingState({ key: typewriterKey, visibleCharacters: typewriterText.length });
-  }, [isTyping, typewriterKey, typewriterText]);
+
+    if (phase === "dialogue") {
+      const audio =
+        dialogueIndex === 0
+          ? nodeOneFirstAudioRef.current
+          : dialogueIndex === 1
+            ? nodeOneSecondAudioRef.current
+            : dialogueIndex === 2
+              ? nodeOneThirdAudioRef.current
+              : dialogueIndex === 3
+                ? nodeOneFourthAudioRef.current
+                : dialogueIndex === 4
+                  ? nodeOneFifthAudioRef.current
+                  : dialogueIndex === 5
+                    ? nodeOneSixthAudioRef.current
+                    : dialogueIndex === 6
+                      ? nodeOneSeventhAudioRef.current
+                      : null;
+      audio?.pause();
+      if (audio) audio.currentTime = 0;
+    } else if (phase === "success") {
+      const audio = nodeOneSuccessAudioRef.current;
+      audio?.pause();
+      if (audio) audio.currentTime = 0;
+    }
+
+    setTypingState({
+      key: typewriterKey,
+      visibleCharacters: typewriterText.length,
+    });
+  }, [dialogueIndex, isTyping, phase, typewriterKey, typewriterText]);
 
   const advanceDialogue = useCallback(() => {
     if (!active || phase !== "dialogue") return;
@@ -99,6 +156,9 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
       finishTyping();
       return;
     }
+    const audio = nodeOneSuccessAudioRef.current;
+    audio?.pause();
+    if (audio) audio.currentTime = 0;
     onExit?.();
   }, [active, finishTyping, isTyping, onExit, phase]);
 
@@ -118,6 +178,99 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
   }, [active]);
 
   useEffect(() => {
+    const audio =
+      !active || phase !== "dialogue"
+        ? null
+        : dialogueIndex === 0
+          ? nodeOneFirstAudioRef.current
+          : dialogueIndex === 1
+            ? nodeOneSecondAudioRef.current
+            : dialogueIndex === 2
+              ? nodeOneThirdAudioRef.current
+              : dialogueIndex === 3
+                ? nodeOneFourthAudioRef.current
+                : dialogueIndex === 4
+                  ? nodeOneFifthAudioRef.current
+                  : dialogueIndex === 5
+                    ? nodeOneSixthAudioRef.current
+                    : dialogueIndex === 6
+                      ? nodeOneSeventhAudioRef.current
+                      : null;
+
+    [
+      nodeOneFirstAudioRef,
+      nodeOneSecondAudioRef,
+      nodeOneThirdAudioRef,
+      nodeOneFourthAudioRef,
+      nodeOneFifthAudioRef,
+      nodeOneSixthAudioRef,
+      nodeOneSeventhAudioRef,
+    ].forEach((audioRef) => {
+      if (audioRef.current !== audio) {
+        audioRef.current?.pause();
+        if (audioRef.current) audioRef.current.currentTime = 0;
+      }
+    });
+
+    if (!audio) return undefined;
+
+    audio.currentTime = 0;
+    const playback = audio.play();
+    playback?.catch(() => {
+      // Playback can be blocked by the browser's autoplay policy.
+    });
+
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, [active, dialogueIndex, phase]);
+
+  useEffect(() => {
+    const audio = nodeOneQuizAudioRef.current;
+    if (!audio) return undefined;
+
+    if (!active || phase !== "quiz") {
+      audio.pause();
+      audio.currentTime = 0;
+      return undefined;
+    }
+
+    audio.currentTime = 0;
+    const playback = audio.play();
+    playback?.catch(() => {
+      setIsQuizAudioPlaying(false);
+    });
+
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, [active, phase]);
+
+  useEffect(() => {
+    const audio = nodeOneSuccessAudioRef.current;
+    if (!audio) return undefined;
+
+    if (!active || phase !== "success") {
+      audio.pause();
+      audio.currentTime = 0;
+      return undefined;
+    }
+
+    audio.currentTime = 0;
+    const playback = audio.play();
+    playback?.catch(() => {
+      setIsSuccessAudioPlaying(false);
+    });
+
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, [active, phase]);
+
+  useEffect(() => {
     if (!active || !isTyping || !typewriterText) return undefined;
 
     const previousCharacter = typewriterText[visibleCharacters - 1];
@@ -130,7 +283,10 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
           current.key === typewriterKey ? current.visibleCharacters : 0;
         return {
           key: typewriterKey,
-          visibleCharacters: Math.min(currentCharacters + 1, typewriterText.length),
+          visibleCharacters: Math.min(
+            currentCharacters + 1,
+            typewriterText.length,
+          ),
         };
       });
     }, delay);
@@ -141,7 +297,7 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
   useEffect(() => {
     if (
       !active ||
-      !isTyping ||
+      !isSpeaking ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       setTalkingFrameIndex(0);
@@ -149,14 +305,17 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
     }
 
     const timer = window.setInterval(() => {
-      setTalkingFrameIndex((index) => (index + 1) % talkingAnimation.frames.length);
+      setTalkingFrameIndex(
+        (index) => (index + 1) % talkingAnimation.frames.length,
+      );
     }, talkingAnimation.frameDuration);
 
     return () => window.clearInterval(timer);
-  }, [active, isTyping, talkingAnimation]);
+  }, [active, isSpeaking, talkingAnimation]);
 
   useEffect(() => {
-    if (!active || (phase !== "dialogue" && phase !== "success")) return undefined;
+    if (!active || (phase !== "dialogue" && phase !== "success"))
+      return undefined;
 
     const onKeyDown = (event) => {
       if (event.defaultPrevented || event.repeat) return;
@@ -191,7 +350,11 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
     setQuizOrder((currentOrder) => {
       const currentIndex = currentOrder.indexOf(optionId);
       const targetIndex = currentIndex + direction;
-      if (currentIndex < 0 || targetIndex < 0 || targetIndex >= currentOrder.length) {
+      if (
+        currentIndex < 0 ||
+        targetIndex < 0 ||
+        targetIndex >= currentOrder.length
+      ) {
         return currentOrder;
       }
 
@@ -205,7 +368,8 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
   }, []);
 
   const startDragging = (event, optionId) => {
-    if (feedback || event.button !== 0 || event.target?.closest?.("button")) return;
+    if (feedback || event.button !== 0 || event.target?.closest?.("button"))
+      return;
 
     event.preventDefault();
     event.stopPropagation();
@@ -215,7 +379,12 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
     const offsetY = (event.clientY - optionBounds.top) / pointer.scaleY;
     const width = optionBounds.width / pointer.scaleX;
     const height = optionBounds.height / pointer.scaleY;
-    dragRef.current = { optionId, pointerId: event.pointerId, offsetX, offsetY };
+    dragRef.current = {
+      optionId,
+      pointerId: event.pointerId,
+      offsetX,
+      offsetY,
+    };
     setDraggedOptionId(optionId);
     setHoveredOptionId(optionId);
     setDragPreview({
@@ -306,17 +475,76 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
 
   return (
     <div className="absolute inset-0">
+      <audio
+        ref={nodeOneFirstAudioRef}
+        src={nodeOneFirstAudio}
+        preload="auto"
+      />
+      <audio
+        ref={nodeOneSecondAudioRef}
+        src={nodeOneSecondAudio}
+        preload="auto"
+      />
+      <audio
+        ref={nodeOneThirdAudioRef}
+        src={nodeOneThirdAudio}
+        preload="auto"
+      />
+      <audio
+        ref={nodeOneFourthAudioRef}
+        src={nodeOneFourthAudio}
+        preload="auto"
+      />
+      <audio
+        ref={nodeOneFifthAudioRef}
+        src={nodeOneFifthAudio}
+        preload="auto"
+      />
+      <audio
+        ref={nodeOneSixthAudioRef}
+        src={nodeOneSixthAudio}
+        preload="auto"
+      />
+      <audio
+        ref={nodeOneSeventhAudioRef}
+        src={nodeOneSeventhAudio}
+        preload="auto"
+      />
+      <audio
+        ref={nodeOneQuizAudioRef}
+        src={nodeOneQuizAudio}
+        preload="auto"
+        onPlay={() => setIsQuizAudioPlaying(true)}
+        onPause={() => setIsQuizAudioPlaying(false)}
+        onEnded={() => setIsQuizAudioPlaying(false)}
+      />
+      <audio
+        ref={nodeOneSuccessAudioRef}
+        src={nodeOneSuccessAudio}
+        preload="auto"
+        onPlay={() => setIsSuccessAudioPlaying(true)}
+        onPause={() => setIsSuccessAudioPlaying(false)}
+        onEnded={() => setIsSuccessAudioPlaying(false)}
+      />
+
       <div className="pointer-events-none absolute bottom-[20px] left-[120px] h-[320px] w-[120px]">
         <div
-          className={`absolute inset-0 ${isTyping ? "" : "avatar-idle"}`}
+          className={`absolute inset-0 ${isSpeaking ? "" : "avatar-idle"}`}
           style={
-            isTyping
-              ? { transform: talkingFrame.transform, transformOrigin: "center bottom" }
+            isSpeaking
+              ? {
+                  transform: talkingFrame.transform,
+                  transformOrigin: "center bottom",
+                }
               : undefined
           }
         >
-          <Avatar avatar={MUDEK} alt={isTyping ? "MUDEK hablando" : "MUDEK"} className="h-full w-full" />
-          {isTyping && (
+          <Avatar
+            avatar={MUDEK}
+            alt={isSpeaking ? "MUDEK hablando" : "MUDEK"}
+            className="h-full w-full"
+          />
+          {isSpeaking && (
             <img
               src={talkingFrame.src}
               alt=""
@@ -340,7 +568,9 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
               <span className="border-2 border-[#101725] bg-[#35d8ff] px-[7px] py-[4px] text-[#101725] shadow-[2px_2px_0_#14768b]">
                 MUDEK
               </span>
-              <span className="text-[#9fe8f4]">LABORATORIO DE LOS ORÍGENES</span>
+              <span className="text-[#9fe8f4]">
+                LABORATORIO DE LOS ORÍGENES
+              </span>
             </span>
             <span className="border-2 border-[#7a5c2e] bg-[#f0ca63] px-[7px] py-[4px] text-[#211922] shadow-[2px_2px_0_#080d16]">
               {String(dialogueIndex + 1).padStart(2, "0")} / 07
@@ -364,9 +594,13 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
           )}
           <span className="flex w-full items-center justify-between border-t-2 border-[#40566d] pt-[6px] font-pixel text-[7px] leading-[1.7]">
             <span className={isTyping ? "text-[#9fe8f4]" : "text-[#ffe6b8]"}>
-              {isTyping ? "ESPACIO O CLIC: MOSTRAR TODO" : "ESPACIO O CLIC: CONTINUAR"}
+              {isTyping
+                ? "ESPACIO O CLIC: MOSTRAR TODO"
+                : "ESPACIO O CLIC: CONTINUAR"}
             </span>
-            <span aria-hidden="true" className="text-[#f0ca63]">▼</span>
+            <span aria-hidden="true" className="text-[#f0ca63]">
+              ▼
+            </span>
           </span>
           <span
             aria-hidden="true"
@@ -389,21 +623,34 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
             <p className="mb-[7px] font-pixel text-[7px] leading-[1.7] text-accent">
               MINIJUEGO · NODO {nodeNumber}
             </p>
-            <h2 id="node-1-quiz-title" className="font-pixel text-[11px] leading-[1.8] text-[#fff3bd] [text-shadow:2px_2px_0_#080d16]">
+            <h2
+              id="node-1-quiz-title"
+              className="font-pixel text-[11px] leading-[1.8] text-[#fff3bd] [text-shadow:2px_2px_0_#080d16]"
+            >
               Ordena la evolución de la IA
             </h2>
-            <p id="sort-instructions" className="mt-[6px] font-pixel text-[7px] leading-[1.8] text-[#e5e7eb]">
-              Arrastra las etapas de la más antigua a la más reciente. También puedes usar las flechas ↑ y ↓.
+            <p
+              id="sort-instructions"
+              className="mt-[6px] font-pixel text-[7px] leading-[1.8] text-[#e5e7eb]"
+            >
+              Arrastra las etapas de la más antigua a la más reciente. También
+              puedes usar las flechas ↑ y ↓.
             </p>
           </header>
 
-          <ol aria-label="Etapas de la evolución de la inteligencia artificial" className="flex flex-1 flex-col justify-center gap-[7px]">
+          <ol
+            aria-label="Etapas de la evolución de la inteligencia artificial"
+            className="flex flex-1 flex-col justify-center gap-[7px]"
+          >
             {quizOrder.map((optionId, index) => {
-              const option = NODE_1_QUIZ_OPTIONS.find((item) => item.id === optionId);
+              const option = NODE_1_QUIZ_OPTIONS.find(
+                (item) => item.id === optionId,
+              );
               if (!option) return null;
 
               const isDragging = draggedOptionId === option.id;
-              const isDropTarget = hoveredOptionId === option.id && isDragging === false;
+              const isDropTarget =
+                hoveredOptionId === option.id && isDragging === false;
 
               return (
                 <li
@@ -419,7 +666,10 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
                   onPointerUp={finishDragging}
                   onPointerCancel={cancelDragging}
                   onKeyDown={(event) => {
-                    if (!feedback && (event.key === "ArrowUp" || event.key === "ArrowDown")) {
+                    if (
+                      !feedback &&
+                      (event.key === "ArrowUp" || event.key === "ArrowDown")
+                    ) {
                       event.preventDefault();
                       event.stopPropagation();
                       moveOptionBy(option.id, event.key === "ArrowUp" ? -1 : 1);
@@ -446,7 +696,9 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
                     <button
                       type="button"
                       aria-label={`Mover “${option.label}” hacia abajo`}
-                      disabled={index === quizOrder.length - 1 || Boolean(feedback)}
+                      disabled={
+                        index === quizOrder.length - 1 || Boolean(feedback)
+                      }
                       onClick={() => moveOptionBy(option.id, 1)}
                       className="grid size-[23px] place-items-center border border-[#826445] bg-[#352b24] font-pixel text-[8px] text-accent hover:bg-[#51402f] disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-white"
                     >
@@ -459,13 +711,19 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
           </ol>
 
           <footer className="mt-[12px] flex min-h-[52px] items-center justify-between gap-[12px] border-t-4 border-[#35d8ff] bg-[#17263a] px-[10px] pb-[8px] pt-[10px] shadow-[inset_0_2px_0_#2c4965]">
-            <div aria-live="polite" className="font-pixel text-[7px] leading-[1.8]">
+            <div
+              aria-live="polite"
+              className="font-pixel text-[7px] leading-[1.8]"
+            >
               {feedback === "incorrect" ? (
                 <span className="text-[#ffd18c]">
-                  Ese orden no es correcto todavía. Revisa la cronología e inténtalo otra vez.
+                  Ese orden no es correcto todavía. Revisa la cronología e
+                  inténtalo otra vez.
                 </span>
               ) : (
-                <span className="text-[#d8e1e5]">Coloca primero la etapa más antigua.</span>
+                <span className="text-[#d8e1e5]">
+                  Coloca primero la etapa más antigua.
+                </span>
               )}
             </div>
             {feedback === "incorrect" ? (
@@ -515,7 +773,9 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
           className="absolute left-[24px] right-[24px] top-[18px] z-30 flex max-h-[235px] cursor-pointer flex-col gap-[8px] border-[5px] border-[#f0ca63] bg-[#101725] px-[15px] py-[10px] text-left text-white shadow-[0_8px_0_#080d16,0_12px_24px_#000000b8] ring-4 ring-[#35d8ff]/80 transition-colors hover:border-[#fff3bd] focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-white"
         >
           <span className="flex items-center justify-between border-b-2 border-[#40566d] pb-[6px] font-pixel text-[8px] leading-[1.7]">
-            <span className="text-[#9fe8f4]">MUDEK · ¡HAS COMPLETADO EL NODO {nodeNumber}!</span>
+            <span className="text-[#9fe8f4]">
+              MUDEK · ¡HAS COMPLETADO EL NODO {nodeNumber}!
+            </span>
             <span className="border-2 border-[#7a5c2e] bg-[#f0ca63] px-[7px] py-[4px] text-[#211922] shadow-[2px_2px_0_#080d16]">
               ÉXITO
             </span>
@@ -529,9 +789,13 @@ export default function Nodo({ active, nodeNumber = 1, onComplete, onExit }) {
           </span>
           <span className="flex items-center justify-between border-t-2 border-[#40566d] pt-[6px] font-pixel text-[7px] leading-[1.7]">
             <span className={isTyping ? "text-[#9fe8f4]" : "text-[#ffe6b8]"}>
-              {isTyping ? "ESPACIO O CLIC: MOSTRAR TODO" : "ESPACIO O CLIC: VOLVER AL MAPA"}
+              {isTyping
+                ? "ESPACIO O CLIC: MOSTRAR TODO"
+                : "ESPACIO O CLIC: VOLVER AL MAPA"}
             </span>
-            <span aria-hidden="true" className="text-[#f0ca63]">▼</span>
+            <span aria-hidden="true" className="text-[#f0ca63]">
+              ▼
+            </span>
           </span>
           <span
             aria-hidden="true"
