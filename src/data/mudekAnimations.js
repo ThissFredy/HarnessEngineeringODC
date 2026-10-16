@@ -1,29 +1,29 @@
-import caminar01 from "../assets/sprites/kai/frames/caminar-01.svg";
-import caminar02 from "../assets/sprites/kai/frames/caminar-02.svg";
-import caminar03 from "../assets/sprites/kai/frames/caminar-03.svg";
-import caminar04 from "../assets/sprites/kai/frames/caminar-04.svg";
-import senalar01 from "../assets/sprites/kai/frames/senalar-01.svg";
-import senalar02 from "../assets/sprites/kai/frames/senalar-02.svg";
-import senalar03 from "../assets/sprites/kai/frames/senalar-03.svg";
-import hablar01 from "../assets/sprites/kai/frames/hablar-01.svg";
-import hablar02 from "../assets/sprites/kai/frames/hablar-02.svg";
-import hablar03 from "../assets/sprites/kai/frames/hablar-03.svg";
-import sonreir01 from "../assets/sprites/kai/frames/sonreir-01.svg";
-import sonreir02 from "../assets/sprites/kai/frames/sonreir-02.svg";
-import sonreir03 from "../assets/sprites/kai/frames/sonreir-03.svg";
-import llorar01 from "../assets/sprites/kai/frames/llorar-01.svg";
-import llorar02 from "../assets/sprites/kai/frames/llorar-02.svg";
-import llorar03 from "../assets/sprites/kai/frames/llorar-03.svg";
-import negar01 from "../assets/sprites/kai/frames/negar-01.svg";
-import negar02 from "../assets/sprites/kai/frames/negar-02.svg";
-import negar03 from "../assets/sprites/kai/frames/negar-03.svg";
-import acertar01 from "../assets/sprites/kai/frames/acertar-01.svg";
-import acertar02 from "../assets/sprites/kai/frames/acertar-02.svg";
-import acertar03 from "../assets/sprites/kai/frames/acertar-03.svg";
-import kaiSenalarBase from "../assets/sprites/kai/kai-senalar-base.svg";
-import kaiAcertarBase from "../assets/sprites/kai/kai-acertar-base.svg";
+import caminar01 from "../assets/sprites/mudek/frames/caminar-01.svg";
+import caminar02 from "../assets/sprites/mudek/frames/caminar-02.svg";
+import caminar03 from "../assets/sprites/mudek/frames/caminar-03.svg";
+import caminar04 from "../assets/sprites/mudek/frames/caminar-04.svg";
+import senalar01 from "../assets/sprites/mudek/frames/senalar-01.svg";
+import senalar02 from "../assets/sprites/mudek/frames/senalar-02.svg";
+import senalar03 from "../assets/sprites/mudek/frames/senalar-03.svg";
+import hablar01 from "../assets/sprites/mudek/frames/hablar-01.svg";
+import hablar02 from "../assets/sprites/mudek/frames/hablar-02.svg";
+import hablar03 from "../assets/sprites/mudek/frames/hablar-03.svg";
+import sonreir01 from "../assets/sprites/mudek/frames/sonreir-01.svg";
+import sonreir02 from "../assets/sprites/mudek/frames/sonreir-02.svg";
+import sonreir03 from "../assets/sprites/mudek/frames/sonreir-03.svg";
+import llorar01 from "../assets/sprites/mudek/frames/llorar-01.svg";
+import llorar02 from "../assets/sprites/mudek/frames/llorar-02.svg";
+import llorar03 from "../assets/sprites/mudek/frames/llorar-03.svg";
+import negar01 from "../assets/sprites/mudek/frames/negar-01.svg";
+import negar02 from "../assets/sprites/mudek/frames/negar-02.svg";
+import negar03 from "../assets/sprites/mudek/frames/negar-03.svg";
+import acertar01 from "../assets/sprites/mudek/frames/acertar-01.svg";
+import acertar02 from "../assets/sprites/mudek/frames/acertar-02.svg";
+import acertar03 from "../assets/sprites/mudek/frames/acertar-03.svg";
+import mudekSenalarBase from "../assets/sprites/mudek/mudek-senalar-base.svg";
+import mudekAcertarBase from "../assets/sprites/mudek/mudek-acertar-base.svg";
 
-export const KAI_ANIMATIONS = {
+export const MUDEK_ANIMATIONS = {
   caminar: {
     label: "Caminar",
     description: "Paso corto en ciclo continuo.",
@@ -38,7 +38,7 @@ export const KAI_ANIMATIONS = {
   senalar: {
     label: "Señalar",
     description: "Gesto de indicación con el índice levantado.",
-    base: kaiSenalarBase,
+    base: mudekSenalarBase,
     frameDuration: 280,
     frames: [
       { src: senalar01, transform: "translateY(0)" },
@@ -89,7 +89,7 @@ export const KAI_ANIMATIONS = {
   acertar: {
     label: "Acertar",
     description: "Afirmación con pulgar arriba.",
-    base: kaiAcertarBase,
+    base: mudekAcertarBase,
     frameDuration: 250,
     frames: [
       { src: acertar01, transform: "translateY(0)" },

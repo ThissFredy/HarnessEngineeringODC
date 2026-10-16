@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Avatar from "../components/Avatar.jsx";
-import { KAI } from "../data/avatars.js";
-import { KAI_ANIMATIONS } from "../data/kaiAnimations.js";
+import { MUDEK } from "../data/avatars.js";
+import { MUDEK_ANIMATIONS } from "../data/mudekAnimations.js";
 
-const KAI_WALK_ANIMATION = KAI_ANIMATIONS.caminar;
+const MUDEK_WALK_ANIMATION = MUDEK_ANIMATIONS.caminar;
 
 const MAP_WIDTH = 1697;
 const MAP_HEIGHT = 927;
@@ -259,9 +259,9 @@ export default function Mapa({ active }) {
 
     const timer = window.setInterval(() => {
       setWalkingFrameIndex(
-        (index) => (index + 1) % KAI_WALK_ANIMATION.frames.length,
+        (index) => (index + 1) % MUDEK_WALK_ANIMATION.frames.length,
       );
-    }, KAI_WALK_ANIMATION.frameDuration);
+    }, MUDEK_WALK_ANIMATION.frameDuration);
 
     return () => window.clearInterval(timer);
   }, [isMoving]);
@@ -309,8 +309,8 @@ export default function Mapa({ active }) {
           }
         >
           <Avatar
-            avatar={KAI}
-            alt={walkingFrame ? "KAI caminando" : KAI.name}
+            avatar={MUDEK}
+            alt={walkingFrame ? "MUDEK caminando" : MUDEK.name}
             className="h-full w-full"
           />
           {walkingFrame && (

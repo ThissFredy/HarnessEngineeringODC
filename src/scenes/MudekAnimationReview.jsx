@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { KAI } from '../data/avatars.js'
+import { MUDEK } from '../data/avatars.js'
 
-export default function KaiAnimationReview({ action, active, sceneNumber }) {
+export default function MudekAnimationReview({ action, active, sceneNumber }) {
   const [frameIndex, setFrameIndex] = useState(0)
   const frame = action.frames[frameIndex]
 
@@ -19,12 +19,12 @@ export default function KaiAnimationReview({ action, active, sceneNumber }) {
   return (
     <section
       className="absolute inset-0 grid place-items-center"
-      aria-label={`Revisión temporal de KAI: ${action.label}`}
+      aria-label={`Revisión temporal de MUDEK: ${action.label}`}
     >
       <div className="grid h-[486px] w-[880px] grid-cols-[minmax(0,1fr)_280px_minmax(0,1fr)] items-center gap-4 border-[6px] border-[#293c53] bg-[#111a2b] p-6 shadow-[0_10px_0_#080d16]">
         <div className="flex flex-col gap-6">
           <p className="text-[10px] leading-relaxed text-[#81cada]">
-            PERSONAJE / KAI
+            PERSONAJE / MUDEK
           </p>
           <div>
             <p className="mb-3 text-[10px] text-[#f0ca63]">ANIMACIÓN</p>
@@ -46,8 +46,8 @@ export default function KaiAnimationReview({ action, active, sceneNumber }) {
             }}
           >
             <img
-              src={action.base ?? KAI.src}
-              alt={`KAI: ${action.label.toLowerCase()}`}
+              src={action.base ?? MUDEK.src}
+              alt={`MUDEK: ${action.label.toLowerCase()}`}
               draggable={false}
               className="absolute inset-0 h-full w-full object-fill [image-rendering:pixelated]"
             />

@@ -1,6 +1,6 @@
-import kai from '../assets/sprites/kai/kai.svg'
+import mudek from '../assets/sprites/mudek/mudek.svg'
 
-export const KAI = {
-  name: 'KAI',
-  src: kai,
+export const MUDEK = {
+  name: 'MUDEK',
+  src: mudek,
 }
