@@ -4,6 +4,13 @@ import { MUDEK } from "../data/avatars.js";
 import { MUDEK_ANIMATIONS } from "../data/mudekAnimations.js";
 import mapOneAudio from "../assets/audio/Map-1.mp3";
 import mapTwoAudio from "../assets/audio/Map-2.mp3";
+import badgeNode1 from "../assets/badges/badge-node-1.png";
+import badgeNode2 from "../assets/badges/badge-node-2.jpeg";
+import badgeNode3 from "../assets/badges/badge-node-3.png";
+import badgeNode4 from "../assets/badges/badge-node-4.png";
+import badgeNode5 from "../assets/badges/badge-node-5.png";
+import badgeNode6 from "../assets/badges/badge-node-6.png";
+import badgeNode7 from "../assets/badges/badge-node-7.png";
 
 const MUDEK_WALK_ANIMATION = MUDEK_ANIMATIONS.caminar;
 const MUDEK_TALK_ANIMATION = MUDEK_ANIMATIONS.hablar;
@@ -20,13 +27,13 @@ const MOVE_SPEED = 260;
 const INITIAL_POSITION = { x: 225, y: 665 };
 
 const NODE_MARKERS = [
-  { num: 1, x: 225, y: 755 },
-  { num: 2, x: 639, y: 756 },
-  { num: 3, x: 853, y: 449 },
-  { num: 4, x: 1059, y: 447 },
-  { num: 5, x: 1059, y: 337 },
-  { num: 6, x: 1352, y: 669 },
-  { num: 7, x: 1506, y: 354 },
+  { num: 1, x: 225, y: 755, badge: badgeNode1 },
+  { num: 2, x: 639, y: 756, badge: badgeNode2 },
+  { num: 3, x: 853, y: 449, badge: badgeNode3 },
+  { num: 4, x: 1059, y: 447, badge: badgeNode4 },
+  { num: 5, x: 1059, y: 337, badge: badgeNode5 },
+  { num: 6, x: 1352, y: 669, badge: badgeNode6 },
+  { num: 7, x: 1506, y: 354, badge: badgeNode7 },
 ];
 
 const GUIDED_PATH = [
@@ -568,14 +575,14 @@ export default function Mapa({
         </button>
       )}
 
-      {NODE_MARKERS.map(({ num, x, y }, index) => {
+      {NODE_MARKERS.map(({ num, x, y, badge }, index) => {
         const isNearby = nearbyNode?.num === num;
 
         return (
           <div
             key={num}
             aria-hidden="true"
-            className="pointer-events-none absolute z-10 grid size-[44px] place-items-center"
+            className="pointer-events-none absolute z-10 grid h-[56px] w-[100px] place-items-center"
             style={{
               left: `${(x / MAP_WIDTH) * 100}%`,
               top: `${(y / MAP_HEIGHT) * 100}%`,
@@ -583,24 +590,15 @@ export default function Mapa({
             }}
           >
             <span
-              className={`map-node-float grid size-full place-items-center rounded-full border-[4px] border-[#202b40] bg-[#f0ca63] shadow-[0_4px_0_#5b3d2d] transition-[filter,transform] ${isNearby ? "scale-125 brightness-125" : ""}`}
+              className={`map-node-float grid size-full place-items-center transition-[filter,transform] ${isNearby ? "scale-125 brightness-125" : ""}`}
               style={{ animationDelay: `${index * -180}ms` }}
             >
-              <svg
-                viewBox="0 0 16 16"
-                className="size-[18px]"
-                shapeRendering="crispEdges"
-              >
-                <path
-                  fill="#9c602d"
-                  d="M6 0h4v3h3v3h3v4h-3v3h-3v3H6v-3H3v-3H0V6h3V3h3z"
-                />
-                <path
-                  fill="#fff3bd"
-                  d="M7 2h2v3h3v2h2v2h-2v2H9v3H7v-3H4V9H2V7h2V5h3z"
-                />
-                <path fill="#e9943e" d="M7 5h2v2h2v2H9v2H7V9H5V7h2z" />
-              </svg>
+              <img
+                src={badge}
+                alt=""
+                draggable={false}
+                className="h-full w-full select-none object-contain [image-rendering:pixelated]"
+              />
             </span>
           </div>
         );
