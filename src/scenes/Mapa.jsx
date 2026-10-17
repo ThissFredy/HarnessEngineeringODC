@@ -5,7 +5,7 @@ import { MUDEK_ANIMATIONS } from "../data/mudekAnimations.js";
 import mapOneAudio from "../assets/audio/Map-1.mp3";
 import mapTwoAudio from "../assets/audio/Map-2.mp3";
 import badgeNode1 from "../assets/badges/badge-node-1.png";
-import badgeNode2 from "../assets/badges/badge-node-2.jpeg";
+import badgeNode2 from "../assets/badges/badge-node-2.png";
 import badgeNode3 from "../assets/badges/badge-node-3.png";
 import badgeNode4 from "../assets/badges/badge-node-4.png";
 import badgeNode5 from "../assets/badges/badge-node-5.png";
@@ -166,7 +166,8 @@ export default function Mapa({
   const isMapDialogueTyping =
     !mapDialogueComplete && mapVisibleCharacters < currentMapMessage.length;
   const mapVisibleText = currentMapMessage.slice(0, mapVisibleCharacters);
-  const isLastMapMessage = mapDialogueIndex === MAP_DIALOGUE_MESSAGES.length - 1;
+  const isLastMapMessage =
+    mapDialogueIndex === MAP_DIALOGUE_MESSAGES.length - 1;
   const canExplore = active && mapDialogueComplete;
   const nearbyNode = useMemo(() => findNearbyNode(position), [position]);
 
@@ -209,13 +210,14 @@ export default function Mapa({
   ]);
 
   useEffect(() => {
-    const audio = !active || mapDialogueComplete
-      ? null
-      : mapDialogueIndex === 0
-        ? mapOneAudioRef.current
-        : mapDialogueIndex === 1
-          ? mapTwoAudioRef.current
-          : null;
+    const audio =
+      !active || mapDialogueComplete
+        ? null
+        : mapDialogueIndex === 0
+          ? mapOneAudioRef.current
+          : mapDialogueIndex === 1
+            ? mapTwoAudioRef.current
+            : null;
 
     [mapOneAudioRef, mapTwoAudioRef].forEach((audioRef) => {
       if (audioRef.current !== audio) {
@@ -239,14 +241,17 @@ export default function Mapa({
   }, [active, mapDialogueComplete, mapDialogueIndex]);
 
   useEffect(() => {
-    if (!active || mapDialogueComplete || !isMapDialogueTyping) return undefined;
+    if (!active || mapDialogueComplete || !isMapDialogueTyping)
+      return undefined;
 
     const previousCharacter = currentMapMessage[mapVisibleCharacters - 1];
     const delay = /[.!?,;:]/.test(previousCharacter ?? "") ? 110 : 50;
     const timer = window.setTimeout(() => {
       setMapTypingState((current) => {
         const currentCharacters =
-          current.messageIndex === mapDialogueIndex ? current.visibleCharacters : 0;
+          current.messageIndex === mapDialogueIndex
+            ? current.visibleCharacters
+            : 0;
         return {
           messageIndex: mapDialogueIndex,
           visibleCharacters: Math.min(
@@ -454,9 +459,10 @@ export default function Mapa({
   const talkingFrame = isAvatarTalking
     ? MUDEK_TALK_ANIMATION.frames[talkingFrameIndex]
     : null;
-  const walkingFrame = canExplore && isMoving
-    ? MUDEK_WALK_ANIMATION.frames[walkingFrameIndex]
-    : null;
+  const walkingFrame =
+    canExplore && isMoving
+      ? MUDEK_WALK_ANIMATION.frames[walkingFrameIndex]
+      : null;
   const avatarFrame = talkingFrame ?? walkingFrame;
 
   return (
@@ -469,7 +475,10 @@ export default function Mapa({
           <div className="absolute left-[12px] top-[12px] z-30 border-[3px] border-[#202b40] bg-[#17263aee] px-[9px] py-[7px] font-normal text-[7px] leading-[1.7] text-white shadow-[0_3px_0_#101725]">
             <span className="block">FLECHAS: MOVER</span>
             <span className="block text-accent">
-              ESPACIO: {enterableNodeNumbers.includes(nearbyNode?.num) ? "ENTRAR" : "DETECTAR"}
+              ESPACIO:{" "}
+              {enterableNodeNumbers.includes(nearbyNode?.num)
+                ? "ENTRAR"
+                : "DETECTAR"}
             </span>
           </div>
           {nearbyNode && (
@@ -485,7 +494,8 @@ export default function Mapa({
               </span>
               {enterableNodeNumbers.includes(nearbyNode.num) && (
                 <span className="mt-[4px] block text-white">
-                  CALIFICACIÓN: {Number(nodeGrades[nearbyNode.num] ?? 0).toFixed(1)} / 5.0
+                  CALIFICACIÓN:{" "}
+                  {Number(nodeGrades[nearbyNode.num] ?? 0).toFixed(1)} / 5.0
                 </span>
               )}
             </div>
@@ -511,7 +521,13 @@ export default function Mapa({
         >
           <Avatar
             avatar={MUDEK}
-            alt={isAvatarTalking ? "MUDEK hablando" : walkingFrame ? "MUDEK caminando" : MUDEK.name}
+            alt={
+              isAvatarTalking
+                ? "MUDEK hablando"
+                : walkingFrame
+                  ? "MUDEK caminando"
+                  : MUDEK.name
+            }
             className="h-full w-full"
           />
           {avatarFrame && (
@@ -548,11 +564,17 @@ export default function Mapa({
 
           <span className="block w-full whitespace-pre-line border-l-[4px] border-[#35d8ff] px-[11px] py-[7px] font-pixel text-[8px] leading-[1.9] text-white [text-shadow:1px_1px_0_#080d16]">
             {mapVisibleText}
-            {isMapDialogueTyping && <span className="ml-[2px] text-[#f0ca63]">▌</span>}
+            {isMapDialogueTyping && (
+              <span className="ml-[2px] text-[#f0ca63]">▌</span>
+            )}
           </span>
 
           <span className="flex w-full items-center justify-between gap-[8px] border-t-2 border-[#40566d] pt-[6px] font-pixel text-[7px] leading-[1.7]">
-            <span className={isMapDialogueTyping ? "text-[#9fe8f4]" : "text-[#ffe6b8]"}>
+            <span
+              className={
+                isMapDialogueTyping ? "text-[#9fe8f4]" : "text-[#ffe6b8]"
+              }
+            >
               {isMapDialogueTyping
                 ? "ESPACIO O CLIC: MOSTRAR TODO"
                 : isLastMapMessage
