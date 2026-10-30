@@ -6,12 +6,18 @@ import Inicio from './scenes/Inicio.jsx'
 import IntroduccionMudek from './scenes/IntroduccionMudek.jsx'
 import Mapa from './scenes/Mapa.jsx'
 import Nodo from './scenes/Nodo.jsx'
+import Nodo2 from './scenes/Nodo2.jsx'
+import Nodo3 from './scenes/Nodo3.jsx'
+import NodoEnConstruccion from './scenes/NodoEnConstruccion.jsx'
 import { SCENES } from './data/scenes.js'
 import useStageViewport from './hooks/useStageViewport.js'
 import fontLicenseUrl from './assets/fonts/OFL-PressStart2P.txt?url'
 
 const ENTERABLE_NODE_NUMBERS = SCENES
   .filter((scene) => scene.type === 'nodo')
+  .map((scene) => scene.nodeNumber)
+const GRADED_NODE_NUMBERS = SCENES
+  .filter((scene) => scene.type === 'nodo' && scene.gradeable)
   .map((scene) => scene.nodeNumber)
 const NODE_GRADES_STORAGE_KEY = 'odc-node-grades-v1'
 
@@ -29,10 +35,10 @@ function readNodeGrades() {
   }
 
   return Object.fromEntries(
-    SCENES.filter((scene) => scene.type === 'nodo').map((scene) => {
-      const grade = savedGrades[scene.nodeNumber]
+    GRADED_NODE_NUMBERS.map((nodeNumber) => {
+      const grade = savedGrades[nodeNumber]
       return [
-        scene.nodeNumber,
+        nodeNumber,
         typeof grade === 'number' && grade >= 0 && grade <= 5 ? grade : 0,
       ]
     }),
@@ -47,6 +53,11 @@ export default function App() {
   const [nodeGrades, setNodeGrades] = useState(readNodeGrades)
   const nodeGradesRef = useRef(nodeGrades)
   const { transform, resetView } = useStageViewport(frameRef)
+  const enterableNodeNumbers = ENTERABLE_NODE_NUMBERS.filter((nodeNumber) => {
+    if (nodeNumber > 2 && Number(nodeGrades[2] ?? 0) < 5) return false
+    if (nodeNumber === 4 && Number(nodeGrades[3] ?? 0) < 5) return false
+    return true
+  })
 
   const navigateToScene = useCallback((name) => {
     const targetScene = SCENES.find((scene) => scene.name === name)
@@ -78,6 +89,10 @@ export default function App() {
   }, [current, curtainTransition, irisTransition])
 
   const handleEnterNode = useCallback((nodeNumber) => {
+    const grades = nodeGradesRef.current
+    if (nodeNumber > 2 && Number(grades[2] ?? 0) < 5) return false
+    if (nodeNumber === 4 && Number(grades[3] ?? 0) < 5) return false
+
     const nodeScene = SCENES.find(
       (scene) => scene.type === 'nodo' && scene.nodeNumber === nodeNumber,
     )
@@ -85,7 +100,7 @@ export default function App() {
   }, [navigateToScene])
 
   const saveNodeGrade = useCallback((nodeNumber, grade) => {
-    if (!ENTERABLE_NODE_NUMBERS.includes(nodeNumber)) return
+    if (!GRADED_NODE_NUMBERS.includes(nodeNumber)) return
 
     const normalizedGrade = Math.round(Math.min(5, Math.max(0, Number(grade) || 0)) * 10) / 10
     const nextGrades = { ...nodeGradesRef.current, [nodeNumber]: normalizedGrade }
@@ -185,7 +200,7 @@ export default function App() {
               {scene.type === 'mapa' && (
                 <Mapa
                   active={active && !irisTransition}
-                  enterableNodeNumbers={ENTERABLE_NODE_NUMBERS}
+                  enterableNodeNumbers={enterableNodeNumbers}
                   nodeGrades={nodeGrades}
                   onEnterNode={handleEnterNode}
                 />
@@ -195,6 +210,27 @@ export default function App() {
                   active={active}
                   nodeNumber={scene.nodeNumber}
                   onComplete={saveNodeGrade}
+                  onExit={() => navigateToScene('mapa')}
+                />
+              )}
+              {scene.type === 'nodo' && scene.nodeNumber === 2 && (
+                <Nodo2
+                  active={active}
+                  onComplete={saveNodeGrade}
+                  onExit={() => navigateToScene('mapa')}
+                />
+              )}
+              {scene.type === 'nodo' && scene.nodeNumber === 3 && (
+                <Nodo3
+                  active={active}
+                  onComplete={saveNodeGrade}
+                  onExit={() => navigateToScene('mapa')}
+                />
+              )}
+              {scene.type === 'nodo' && scene.nodeNumber >= 4 && (
+                <NodoEnConstruccion
+                  active={active}
+                  nodeNumber={scene.nodeNumber}
                   onExit={() => navigateToScene('mapa')}
                 />
               )}

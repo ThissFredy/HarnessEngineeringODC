@@ -170,6 +170,16 @@ export default function Mapa({
     mapDialogueIndex === MAP_DIALOGUE_MESSAGES.length - 1;
   const canExplore = active && mapDialogueComplete;
   const nearbyNode = useMemo(() => findNearbyNode(position), [position]);
+  const nearbyNodeIsEnterable =
+    nearbyNode && enterableNodeNumbers.includes(nearbyNode.num);
+  const nearbyNodeLockRequirement =
+    !nearbyNode || nearbyNodeIsEnterable
+      ? null
+      : nearbyNode.num > 2 && Number(nodeGrades[2] ?? 0) < 5
+        ? 2
+        : nearbyNode.num === 4 && Number(nodeGrades[3] ?? 0) < 5
+          ? 3
+          : null;
 
   const finishMapDialogueTyping = useCallback(() => {
     if (!isMapDialogueTyping) return;
@@ -400,6 +410,11 @@ export default function Mapa({
 
         const node = findNearbyNode(positionRef.current);
         if (node) {
+          if (!enterableNodeNumbers.includes(node.num)) {
+            setSpaceDetectedNode(node.num);
+            return;
+          }
+
           const enteredNode = onEnterNode?.(node.num);
           if (!enteredNode) setSpaceDetectedNode(node.num);
         }
@@ -431,7 +446,7 @@ export default function Mapa({
       window.removeEventListener("blur", stopMoving);
       clearMovement();
     };
-  }, [canExplore, onEnterNode]);
+  }, [canExplore, enterableNodeNumbers, onEnterNode]);
 
   useEffect(() => {
     if (
@@ -476,9 +491,11 @@ export default function Mapa({
             <span className="block">FLECHAS: MOVER</span>
             <span className="block text-accent">
               ESPACIO:{" "}
-              {enterableNodeNumbers.includes(nearbyNode?.num)
+              {nearbyNodeIsEnterable
                 ? "ENTRAR"
-                : "DETECTAR"}
+                : nearbyNodeLockRequirement
+                  ? `COMPLETA NODO ${nearbyNodeLockRequirement}`
+                  : "DETECTAR"}
             </span>
           </div>
           {nearbyNode && (
@@ -488,11 +505,20 @@ export default function Mapa({
               className="absolute left-[12px] top-[61px] z-30 border-[3px] border-[#202b40] bg-[#17263aee] px-[9px] py-[7px] font-normal text-[7px] leading-[1.7] text-accent shadow-[0_3px_0_#101725]"
             >
               <span className="block">
-                {spaceDetectedNode === nearbyNode.num
-                  ? `ESPACIO DETECTADO · NODO ${nearbyNode.num}`
-                  : `NODO ${nearbyNode.num} · PULSA ESPACIO`}
+                {nearbyNodeLockRequirement
+                  ? spaceDetectedNode === nearbyNode.num
+                    ? "ACCESO BLOQUEADO"
+                    : `NODO ${nearbyNode.num} · BLOQUEADO`
+                  : spaceDetectedNode === nearbyNode.num
+                    ? `ESPACIO DETECTADO · NODO ${nearbyNode.num}`
+                    : `NODO ${nearbyNode.num} · PULSA ESPACIO`}
               </span>
-              {enterableNodeNumbers.includes(nearbyNode.num) && (
+              {nearbyNodeLockRequirement && (
+                <span className="mt-[4px] block text-[#ffd18c]">
+                  COMPLETA EL NODO {nearbyNodeLockRequirement} PARA DESBLOQUEAR
+                </span>
+              )}
+              {Object.hasOwn(nodeGrades, nearbyNode.num) && (
                 <span className="mt-[4px] block text-white">
                   CALIFICACIÓN:{" "}
                   {Number(nodeGrades[nearbyNode.num] ?? 0).toFixed(1)} / 5.0

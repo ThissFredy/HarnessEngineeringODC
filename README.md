@@ -236,7 +236,7 @@ pnpm dev
 
 Dev server con HMR en http://localhost:5173. Sin LMS, el wrapper SCORM entra en **modo fallback** (`localStorage` + traza en consola).
 
-Navegación dev (atajos numéricos desactivados en producción): `1` = portada, `2` = introducción de MUDEK, `3` = mapa y `4` = Nodo 1; las escenas futuras se añaden en orden. En el mapa, las flechas mueven el avatar por los caminos y `Espacio` permite entrar al Nodo 1 al acercarse a su marcador (en los demás nodos solo se detecta). `0` o doble toque resetea el zoom.
+Navegación dev (atajos numéricos desactivados en producción): `1` = portada, `2` = introducción de MUDEK, `3` = mapa, `4` = Nodo 1, `5` = Nodo 2, `6`–`9` = Nodos 3–6. El Nodo 7 se abre desde el mapa. Las flechas mueven a MUDEK y `Espacio` permite entrar a los nodos disponibles al acercarse a su marcador. El Nodo 3 incluye una minievaluación; responder correctamente sus tres afirmaciones asigna 5.0 y desbloquea el Nodo 4. Los Nodos 4–7 muestran una pantalla provisional hasta integrar su contenido. `0` o doble toque resetea el zoom.
 
 ### Build (genera el SCO)
 
