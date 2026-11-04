@@ -246,7 +246,7 @@ function Node2Quiz({
   const assignedCaseIds = new Set(Object.values(assignments));
   const orderedCases = NODE_2_QUIZ_CASE_ORDER.map((caseId) =>
     NODE_2_CASES.find((item) => item.id === caseId),
-  ).filter((item) => item && !assignedCaseIds.has(item.id));
+  ).filter(Boolean);
 
   useEffect(() => {
     quizTitleRef.current?.focus();
@@ -318,6 +318,16 @@ function Node2Quiz({
             className="flex min-h-0 flex-1 flex-col gap-[5px]"
           >
             {orderedCases.map((item) => {
+              if (assignedCaseIds.has(item.id)) {
+                return (
+                  <li
+                    key={item.id}
+                    aria-hidden="true"
+                    className="min-h-0 flex-1"
+                  />
+                );
+              }
+
               const isSelected = selectedCaseId === item.id;
               const isDragging = draggedCaseId === item.id;
               const originalPosition =
