@@ -3,6 +3,7 @@ import mapa from "../assets/backgrounds/map.png";
 import nodo1 from "../assets/backgrounds/nodo-1.jpeg";
 import nodo2 from "../assets/backgrounds/nodo-2.jpeg";
 import nodo3 from "../assets/backgrounds/nodo-3.png";
+import nodo4 from "../assets/backgrounds/nodo-4.jpeg";
 
 export const SCENES = [
   { type: "inicio", name: "inicio", bg: inicio },
@@ -28,9 +29,10 @@ export const SCENES = [
     type: "nodo",
     nodeNumber: 4,
     name: "nodo-4",
-    bg: inicio,
+    bg: nodo4,
     imageRendering: "auto",
-    backgroundBrightness: 0.42,
+    backgroundBrightness: 0.56,
+    gradeable: true,
   },
   {
     type: "nodo",
