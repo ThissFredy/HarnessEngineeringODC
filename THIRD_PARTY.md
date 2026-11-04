@@ -9,6 +9,15 @@ Recursos y herramientas de terceros utilizados por el proyecto. **Todo es open s
 | [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) (Cody Boisclair) | SIL OFL 1.1 | `src/assets/fonts/OFL-PressStart2P.txt` (viaja dentro de `dist/`) | Tipografía de interfaz |
 | Ilustración retro pixel art de biblioteca y campus (arte original del proyecto) | CC BY 4.0 | `LICENSE-CONTENT.txt` | Fuente SVG `src/assets/backgrounds/inicio.svg`; versión raster pixelada `src/assets/backgrounds/inicio-pixel.png` usada en portada |
 | Mapa Overworld retro pixel art (arte original del proyecto) | CC BY 4.0 | `LICENSE-CONTENT.txt` | Fuente SVG `src/assets/backgrounds/mapa.svg`; versión raster de 768×450 y 80 colores `src/assets/backgrounds/mapa-pixel.png` usada en mapa |
+| Estación de Conexiones (arte original del proyecto) | CC BY 4.0 | `LICENSE-CONTENT.txt` | `src/assets/backgrounds/nodo-5.jpeg` |
+| Narración inicial del Nodo 5 (audio generado con ElevenLabs; plan pago, no Beta; el servicio no se empaqueta en el SCO) | CC BY 4.0 | `LICENSE-CONTENT.txt` | `src/assets/audio/Nodo-5-1.mp3` |
+
+## Referencias de ejemplos didácticos MCP (no se empaqueta código)
+
+| Recurso | Licencia | Fuente | Uso |
+|---|---|---|---|
+| Filesystem MCP Server | MIT | [Repositorio oficial](https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem) | Ejemplo de servidor con acceso limitado a directorios configurados |
+| Git MCP Server | MIT | [Repositorio oficial](https://github.com/modelcontextprotocol/servers/tree/main/src/git) | Ejemplo de herramientas para consultar y modificar un repositorio Git |
 
 ## Dependencias de desarrollo (NO se empaquetan en el SCO)
 

@@ -9,6 +9,7 @@ import Nodo from './scenes/Nodo.jsx'
 import Nodo2 from './scenes/Nodo2.jsx'
 import Nodo3 from './scenes/Nodo3.jsx'
 import Nodo4 from './scenes/Nodo4.jsx'
+import Nodo5 from './scenes/Nodo5.jsx'
 import NodoEnConstruccion from './scenes/NodoEnConstruccion.jsx'
 import { SCENES } from './data/scenes.js'
 import useStageViewport from './hooks/useStageViewport.js'
@@ -235,7 +236,14 @@ export default function App() {
                   onExit={() => navigateToScene('mapa')}
                 />
               )}
-              {scene.type === 'nodo' && scene.nodeNumber >= 5 && (
+              {scene.type === 'nodo' && scene.nodeNumber === 5 && (
+                <Nodo5
+                  active={active}
+                  onComplete={saveNodeGrade}
+                  onExit={() => navigateToScene('mapa')}
+                />
+              )}
+              {scene.type === 'nodo' && scene.nodeNumber >= 6 && (
                 <NodoEnConstruccion
                   active={active}
                   nodeNumber={scene.nodeNumber}
