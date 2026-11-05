@@ -5,6 +5,7 @@ import nodo2 from "../assets/backgrounds/nodo-2.jpeg";
 import nodo3 from "../assets/backgrounds/nodo-3.png";
 import nodo4 from "../assets/backgrounds/nodo-4.jpeg";
 import nodo5 from "../assets/backgrounds/nodo-5.jpeg";
+import nodo6 from "../assets/backgrounds/nodo-6.jpeg";
 
 export const SCENES = [
   { type: "inicio", name: "inicio", bg: inicio },
@@ -48,9 +49,10 @@ export const SCENES = [
     type: "nodo",
     nodeNumber: 6,
     name: "nodo-6",
-    bg: inicio,
+    bg: nodo6,
     imageRendering: "auto",
-    backgroundBrightness: 0.42,
+    backgroundBrightness: 0.62,
+    gradeable: true,
   },
   {
     type: "nodo",

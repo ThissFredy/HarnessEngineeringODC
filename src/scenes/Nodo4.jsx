@@ -10,6 +10,8 @@ import {
   NODE_4_TERMS,
 } from "../data/nodo4.js";
 import nodeFourIntroAudio from "../assets/audio/Nodo-4-1.mp3";
+import fuzzingBugImage from "../assets/illustrations/pixel-bug.png";
+import pythonLogo from "../assets/illustrations/python-logo-notext.svg";
 
 const PASSING_GRADE = 5.0;
 const TYPEWRITER_CHARACTER_DELAY = 50;
@@ -69,9 +71,9 @@ function TermButton({ term, viewed, onOpen }) {
       aria-label={`Abrir término: ${term.title}${viewed ? ". Ya consultado" : ""}`}
       aria-haspopup="dialog"
       onClick={(event) => onOpen(term.id, event)}
-      className={`flex min-h-[46px] min-w-0 items-center gap-[7px] border-2 px-[7px] py-[6px] text-left font-pixel text-[8px] leading-[1.6] transition-colors hover:border-white active:translate-y-[2px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${viewed ? "border-[#35d8ff] bg-[#153141] text-[#c1f4ff]" : "border-[#8b7040] bg-[#352d24] text-[#ffe6b8]"}`}
+      className={`flex min-h-[60px] min-w-0 items-center gap-[9px] border-2 px-[10px] py-[8px] text-left font-pixel text-[10px] leading-[1.6] transition-colors hover:border-white active:translate-y-[2px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${viewed ? "border-[#35d8ff] bg-[#153141] text-[#c1f4ff]" : "border-[#8b7040] bg-[#352d24] text-[#ffe6b8]"}`}
     >
-      <span className="grid size-[24px] shrink-0 place-items-center border-2 border-[#101725] bg-[#f0ca63] font-pixel text-[10px] leading-none text-[#101725] shadow-[2px_2px_0_#080d16]">
+      <span className="grid size-[30px] shrink-0 place-items-center border-2 border-[#101725] bg-[#f0ca63] font-pixel text-[12px] leading-none text-[#101725] shadow-[2px_2px_0_#080d16]">
         {viewed ? "✓" : "+"}
       </span>
       <span className="min-w-0">{term.label}</span>
@@ -160,13 +162,21 @@ function ReadingView({ viewedTermIds, onOpenTerm, onBeginQuiz }) {
             )}
 
             {block.evidenceEyebrow && (
-              <aside className="mt-auto border-l-[3px] border-[#f0ca63] bg-[#101725] px-[8px] py-[7px]">
-                <p className="font-pixel text-[5px] leading-[1.6] text-[#f0ca63]">
-                  {block.evidenceEyebrow}
-                </p>
-                <p className="mt-[4px] font-pixel text-[6px] leading-[1.75] text-[#e5e7eb]">
-                  {block.evidenceText}
-                </p>
+              <aside className="mt-auto grid min-h-[108px] grid-cols-[minmax(0,1fr)_96px] items-center gap-[9px] border-l-[3px] border-[#f0ca63] bg-[#101725] px-[9px] py-[8px]">
+                <div className="min-w-0">
+                  <p className="font-pixel text-[8px] leading-[1.7] text-[#f0ca63]">
+                    {block.evidenceEyebrow}
+                  </p>
+                  <p className="mt-[5px] font-pixel text-[7px] leading-[1.75] text-[#e5e7eb]">
+                    {block.evidenceText}
+                  </p>
+                </div>
+                <img
+                  src={fuzzingBugImage}
+                  alt="Un error de software representado como un insecto pixelado."
+                  draggable={false}
+                  className="size-[88px] border-2 border-[#080d16] bg-[#f0ca63] object-contain p-[5px] shadow-[3px_3px_0_#080d16] [image-rendering:pixelated]"
+                />
               </aside>
             )}
 
@@ -175,14 +185,37 @@ function ReadingView({ viewedTermIds, onOpenTerm, onBeginQuiz }) {
                 {block.evidence.map((item) => (
                   <aside
                     key={item.eyebrow}
-                    className="flex min-h-0 flex-1 flex-col justify-center border-l-[3px] border-[#35d8ff] bg-[#101725] px-[7px] py-[5px]"
+                    className={`flex min-h-0 flex-1 border-l-[3px] border-[#35d8ff] bg-[#101725] px-[7px] py-[5px] ${item.logo ? "items-center gap-[8px]" : "flex-col justify-center"}`}
                   >
-                    <p className="font-pixel text-[5px] leading-[1.5] text-[#9fe8f4]">
-                      {item.eyebrow}
-                    </p>
-                    <p className="mt-[3px] font-pixel text-[6px] leading-[1.65] text-[#e5e7eb]">
-                      {item.text}
-                    </p>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-pixel text-[5px] leading-[1.5] text-[#9fe8f4]">
+                        {item.eyebrow}
+                      </p>
+                      <p className="mt-[3px] font-pixel text-[6px] leading-[1.65] text-[#e5e7eb]">
+                        {item.text}
+                      </p>
+                    </div>
+                    {item.logo === "python" && (
+                      <div
+                        role="img"
+                        aria-label="Logotipo de Python, marca de Python Software Foundation."
+                        className="flex h-[48px] w-[54px] shrink-0 items-center justify-center gap-[1px] border-2 border-[#080d16] bg-[#fff3bd] px-[3px] shadow-[2px_2px_0_#080d16]"
+                      >
+                        <img
+                          src={pythonLogo}
+                          alt=""
+                          aria-hidden="true"
+                          draggable={false}
+                          className="size-[34px] object-contain"
+                        />
+                        <span
+                          aria-hidden="true"
+                          className="font-pixel text-[6px] text-[#101725]"
+                        >
+                          ™
+                        </span>
+                      </div>
+                    )}
                   </aside>
                 ))}
               </div>
@@ -210,7 +243,7 @@ function ReadingView({ viewedTermIds, onOpenTerm, onBeginQuiz }) {
         <p
           id="node-4-glossary-status"
           aria-live="polite"
-          className="font-pixel text-[6px] leading-[1.7] text-[#9fe8f4]"
+          className="font-pixel text-[7px] leading-[1.7] text-[#9fe8f4]"
         >
           TÉRMINOS CONSULTADOS: {viewedTermIds.length} / {NODE_4_TERMS.length}
         </p>
@@ -220,7 +253,7 @@ function ReadingView({ viewedTermIds, onOpenTerm, onBeginQuiz }) {
           aria-describedby={!allTermsViewed ? "node-4-glossary-status" : undefined}
           disabled={!allTermsViewed}
           onClick={onBeginQuiz}
-          className={`min-h-[36px] border-2 border-[#080d16] px-[10px] py-[5px] font-pixel text-[6px] leading-[1.5] shadow-[0_3px_0_#080d16] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${allTermsViewed ? "bg-[#f0ca63] text-[#101725] hover:bg-[#fff3bd] active:translate-y-[2px] active:shadow-[0_1px_0_#080d16]" : "cursor-not-allowed bg-[#59606a] text-[#c8cdd2] opacity-80"}`}
+          className={`min-h-[40px] border-2 border-[#080d16] px-[10px] py-[5px] font-pixel text-[7px] leading-[1.5] shadow-[0_3px_0_#080d16] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${allTermsViewed ? "bg-[#f0ca63] text-[#101725] hover:bg-[#fff3bd] active:translate-y-[2px] active:shadow-[0_1px_0_#080d16]" : "cursor-not-allowed bg-[#59606a] text-[#c8cdd2] opacity-80"}`}
         >
           {allTermsViewed ? "IR A LOS ESCENARIOS →" : "CONSULTA LOS «+»"}
         </button>
@@ -444,7 +477,7 @@ function TermDialog({ term, closeButtonRef, dialogRef, onClose, onBackdropClick 
   return (
     <div
       data-stage-interactive
-      className="absolute inset-0 z-[70] grid place-items-center bg-[#080d16]/90 p-[32px]"
+      className="absolute inset-0 z-[70] grid place-items-center bg-[#080d16]/95 p-[20px]"
       onClick={onBackdropClick}
     >
       <section
@@ -453,40 +486,50 @@ function TermDialog({ term, closeButtonRef, dialogRef, onClose, onBackdropClick 
         aria-modal="true"
         aria-labelledby="node-4-term-title"
         aria-describedby="node-4-term-description"
-        className="w-full max-w-[620px] border-[5px] border-[#f0ca63] bg-[#101725] p-[14px] text-white shadow-[0_8px_0_#080d16,0_12px_24px_#000000b8] ring-4 ring-[#35d8ff]"
+        className="flex max-h-full w-full max-w-[900px] flex-col border-[5px] border-[#f0ca63] bg-[#101725] p-[18px] text-white shadow-[0_8px_0_#080d16,0_12px_24px_#000000b8] ring-4 ring-[#35d8ff]"
       >
-        <header className="flex items-center justify-between gap-[10px] border-b-4 border-[#35d8ff] bg-[#17263a] px-[10px] py-[8px]">
-          <span className="font-pixel text-[7px] leading-[1.7] text-[#9fe8f4]">
-            GLOSARIO · CENTRO DE CONTROL
+        <header className="flex items-center justify-between gap-[10px] border-b-4 border-[#35d8ff] bg-[#17263a] px-[14px] py-[11px]">
+          <span className="font-pixel text-[9px] leading-[1.7] text-[#9fe8f4]">
+            GLOSARIO
           </span>
-          <span className="border-2 border-[#7a5c2e] bg-[#f0ca63] px-[6px] py-[3px] font-pixel text-[6px] text-[#101725]">
-            TÉRMINO CLAVE
+          <span className="border-2 border-[#7a5c2e] bg-[#f0ca63] px-[8px] py-[5px] font-pixel text-[8px] text-[#101725]">
+            CONCEPTO
           </span>
         </header>
         <h2
           id="node-4-term-title"
-          className="mt-[12px] font-pixel text-[12px] leading-[1.8] text-[#fff3bd] [text-shadow:2px_2px_0_#080d16]"
+          className="mt-[18px] font-pixel text-[19px] leading-[1.7] text-[#fff3bd] [text-shadow:2px_2px_0_#080d16]"
         >
           {term.title}
         </h2>
-        <p
-          id="node-4-term-description"
-          className="mt-[8px] border-l-[4px] border-[#35d8ff] bg-[#17263a] px-[12px] py-[11px] font-pixel text-[11px] leading-[1.8] text-white"
-        >
-          {term.body}
-        </p>
-        <footer className="mt-[11px] flex items-center justify-between gap-[10px] border-t-2 border-[#40566d] pt-[9px]">
-          <span className="font-pixel text-[6px] leading-[1.7] text-[#9fe8f4]">
-            ESC PARA CERRAR · TÉRMINO AÑADIDO A TU REPASO
+        <div className="mt-[14px] border-l-[6px] border-[#35d8ff] bg-[#17263a] px-[20px] py-[17px]">
+          <p className="mb-[9px] font-pixel text-[8px] leading-[1.7] text-[#9fe8f4]">
+            IDEA CLAVE
+          </p>
+          <p
+            id="node-4-term-description"
+            className="font-pixel text-[16px] leading-[1.9] text-white [text-shadow:1px_1px_0_#080d16]"
+          >
+            {term.body}
+          </p>
+          {term.citation && (
+            <p className="mt-[12px] border-t border-[#40566d] pt-[9px] font-pixel text-[8px] leading-[1.7] text-[#b8dce5]">
+              FUENTE · {term.citation}
+            </p>
+          )}
+        </div>
+        <footer className="mt-[16px] flex items-center justify-between gap-[10px] border-t-2 border-[#40566d] pt-[12px]">
+          <span className="font-pixel text-[8px] leading-[1.7] text-[#9fe8f4]">
+            ESC PARA CERRAR
           </span>
           <button
             ref={closeButtonRef}
             type="button"
             data-stage-interactive
             onClick={onClose}
-            className="min-h-[40px] border-2 border-[#080d16] bg-[#f0ca63] px-[11px] py-[7px] font-pixel text-[7px] leading-[1.5] text-[#101725] shadow-[0_3px_0_#080d16] hover:bg-[#fff3bd] active:translate-y-[2px] active:shadow-[0_1px_0_#080d16] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="min-h-[48px] border-2 border-[#080d16] bg-[#f0ca63] px-[16px] py-[9px] font-pixel text-[9px] leading-[1.5] text-[#101725] shadow-[0_3px_0_#080d16] hover:bg-[#fff3bd] active:translate-y-[2px] active:shadow-[0_1px_0_#080d16] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
-            VOLVER AL CENTRO
+            CERRAR
           </button>
         </footer>
       </section>

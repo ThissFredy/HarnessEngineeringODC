@@ -40,6 +40,8 @@ Pregunta solo por los elementos ausentes que sean necesarios para diseñar el no
 - Coloca cada cita junto a la afirmación que sustenta, con el formato autor-año usado por el proyecto. No presentes una interpretación propia como resultado del estudio.
 - Elige la estructura según el objetivo: relato, comparación, línea de tiempo, diagrama, tarjetas, conceptos emergentes u otro formato pertinente. No fuerces todos los nodos a repetir exactamente los dos bloques o el reto de Nodo 2.
 - Divide el contenido en unidades breves, con títulos informativos y jerarquía visual. Evita párrafos densos y texto amontonado.
+- Prioriza la accesibilidad visual: el texto principal debe leerse con claridad a la escala real del `Stage`, con tamaño suficiente, contraste alto e interlineado cómodo. Aprovecha el espacio interior de cada `div` o panel para dar aire y destacar la información; no reduzcas la tipografía para hacer caber demasiado contenido. Si no cabe, sintetiza el texto o redistribuye los bloques.
+- Evita apilar demasiadas frases en una sola zona. Presenta una idea principal por bloque, usa títulos breves y separa visualmente explicación, ejemplo e instrucciones. Mantén visibles primero los datos esenciales y deja los detalles secundarios para una interacción opcional cuando sea pertinente.
 - Asigna una función distinta a cada elemento: el bloque explica la idea, el caso aporta evidencia, el glosario define el término y la retroalimentación ayuda a corregir o comprender la respuesta. **No repitas el mismo párrafo o dato completo** en el bloque, la ventana del caso, el glosario y el reto. Reitera una cifra en la evaluación solo si es necesaria para explicar el acierto.
 - Mantén visibles las citas incluso cuando el texto se presente en ventanas emergentes o retroalimentación.
 - Si hay conceptos emergentes, usa definiciones concisas. Si hay casos, haz explícita su relación con la etapa o decisión que el estudiante debe aprender a reconocer.
@@ -55,6 +57,7 @@ Pregunta solo por los elementos ausentes que sean necesarios para diseñar el no
 ## 5. Implementar con las convenciones del juego
 
 - Conserva el escenario de **1024 × 599 px** y diseña en coordenadas de `Stage`; comprueba la alineación al cambiar la escala.
+- Distribuye el contenido aprovechando el ancho y alto disponibles en los contenedores: evita dejar espacio útil sin usar mientras comprimes texto en tarjetas estrechas o zonas pequeñas. Ajusta la distribución, el tamaño de los paneles y la separación entre elementos antes de reducir la letra; verifica que los textos no se amontonen ni queden cortados al escalar.
 - Mantén la estética retro 16-bit, la paleta del proyecto (`#101725`, `#17263a`, `#f0ca63`, `#35d8ff`, `#080d16`) y `font-pixel` / Press Start 2P. No sustituyas la tipografía.
 - Conserva proporciones y nitidez de sprites pixel art. No fuerces `pixelated` en fondos que deban usar `imageRendering: "auto"`.
 - Mantén MUDEK sin cubrir ni desplazar en Nodo 1. En otros nodos, respeta la composición y ubicación establecidas por el nodo existente.

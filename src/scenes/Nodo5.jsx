@@ -12,10 +12,14 @@ import {
 import nodeFiveIntroAudio from "../assets/audio/Nodo-5-1.mp3";
 
 const PASSING_GRADE = 5.0;
+const TOTAL_FLOW_STEPS = 3;
 const TYPEWRITER_CHARACTER_DELAY = 50;
 const TYPEWRITER_PAUSE_DELAY = 110;
 const TALKING_ANIMATION = MUDEK_ANIMATIONS.hablar;
-const TERM_IDS = NODE_5_TERMS.map((term) => term.id);
+const SECTION_TERM_IDS = [
+  ["mcp-server", "security-labels"],
+  ["skill-anatomy", "progressive-disclosure"],
+];
 
 function Node5Header({ step, stepNumber, title, titleId, titleRef }) {
   return (
@@ -45,14 +49,14 @@ function Node5Header({ step, stepNumber, title, titleId, titleRef }) {
             PROGRESO
           </p>
           <p className="text-right font-pixel text-[7px] leading-[1.5] text-[#f0ca63]">
-            {String(stepNumber).padStart(2, "0")} / 02
+            {String(stepNumber).padStart(2, "0")} / {String(TOTAL_FLOW_STEPS).padStart(2, "0")}
           </p>
         </div>
         <div className="flex gap-[3px]" aria-hidden="true">
-          {[0, 1].map((index) => (
+          {Array.from({ length: TOTAL_FLOW_STEPS }, (_, index) => (
             <span
               key={index}
-              className={`h-[9px] w-[17px] border border-[#080d16] ${index < stepNumber ? "bg-[#35d8ff] shadow-[inset_0_0_0_2px_#14768b]" : "bg-[#344354]"}`}
+              className={`h-[9px] w-[16px] border border-[#080d16] ${index < stepNumber ? "bg-[#35d8ff] shadow-[inset_0_0_0_2px_#14768b]" : "bg-[#344354]"}`}
             />
           ))}
         </div>
@@ -69,9 +73,9 @@ function TermButton({ term, viewed, onOpen }) {
       aria-label={`Abrir término: ${term.title}${viewed ? ". Ya consultado" : ""}`}
       aria-haspopup="dialog"
       onClick={(event) => onOpen(term.id, event)}
-      className={`flex min-h-[42px] min-w-0 items-center gap-[7px] border-2 px-[7px] py-[6px] text-left font-pixel text-[6px] leading-[1.6] transition-colors hover:border-white active:translate-y-[2px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${viewed ? "border-[#35d8ff] bg-[#153141] text-[#c1f4ff]" : "border-[#8b7040] bg-[#352d24] text-[#ffe6b8]"}`}
+      className={`flex min-h-[66px] min-w-0 items-center gap-[10px] border-2 px-[11px] py-[9px] text-left font-pixel text-[9px] leading-[1.7] transition-colors hover:border-white active:translate-y-[2px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${viewed ? "border-[#35d8ff] bg-[#153141] text-[#c1f4ff]" : "border-[#8b7040] bg-[#352d24] text-[#ffe6b8]"}`}
     >
-      <span className="grid size-[22px] shrink-0 place-items-center border-2 border-[#101725] bg-[#f0ca63] font-pixel text-[9px] leading-none text-[#101725] shadow-[2px_2px_0_#080d16]">
+      <span className="grid size-[32px] shrink-0 place-items-center border-2 border-[#101725] bg-[#f0ca63] font-pixel text-[12px] leading-none text-[#101725] shadow-[2px_2px_0_#080d16]">
         {viewed ? "✓" : "+"}
       </span>
       <span className="min-w-0">{term.label}</span>
@@ -79,114 +83,128 @@ function TermButton({ term, viewed, onOpen }) {
   );
 }
 
-function ReadingView({ viewedTermIds, onOpenTerm, onBeginQuiz }) {
+function ReadingBlock({ block }) {
+  const diagramDescription =
+    block.id === "mcp"
+      ? "Una aplicación de IA consulta un servidor MCP que expone herramientas y datos"
+      : "Una Skill presenta sus metadatos primero y carga instrucciones y recursos cuando hacen falta";
+
+  return (
+    <article
+      aria-labelledby={`node-5-block-${block.id}-title`}
+      className="flex min-h-0 flex-col border-2 border-[#52616a] bg-[#17263a] p-[14px] shadow-[inset_0_2px_0_#2c4965]"
+    >
+      <header className="flex shrink-0 items-center gap-[11px] border-b border-[#40566d] pb-[9px]">
+        <span className="grid size-[38px] shrink-0 place-items-center border-2 border-[#7a5c2e] bg-[#f0ca63] font-pixel text-[13px] text-[#101725] shadow-[3px_3px_0_#080d16]">
+          {block.marker}
+        </span>
+        <div className="min-w-0">
+          <p className="font-pixel text-[8px] leading-[1.7] text-[#35d8ff]">
+            {block.eyebrow}
+          </p>
+          <h2
+            id={`node-5-block-${block.id}-title`}
+            className="font-pixel text-[12px] leading-[1.8] text-[#fff3bd]"
+          >
+            {block.title}
+          </h2>
+        </div>
+      </header>
+
+      <p className="mt-[9px] font-pixel text-[8px] leading-[1.8] text-white">
+        {block.text}
+      </p>
+
+      <div
+        role="img"
+        aria-label={diagramDescription}
+        className="mt-[8px] grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-[7px] border-2 border-[#40566d] bg-[#101725] px-[9px] py-[6px]"
+      >
+        {block.diagram.map((label, index) => (
+          <span key={label} className="contents">
+            <span className="grid min-h-[44px] place-items-center border-2 border-[#35d8ff] bg-[#153141] px-[8px] text-center font-pixel text-[7px] leading-[1.6] text-[#c1f4ff]">
+              {label}
+            </span>
+            {index < block.diagram.length - 1 && (
+              <span
+                aria-hidden="true"
+                className="font-pixel text-[12px] text-[#f0ca63]"
+              >
+                →
+              </span>
+            )}
+          </span>
+        ))}
+      </div>
+
+      {block.evidence && (
+        <div className="mt-[8px] grid min-h-0 flex-1 grid-cols-2 gap-[10px]">
+          {block.evidence.map((item) => (
+            <aside
+              key={item.eyebrow}
+              className="border-l-[4px] border-[#f0ca63] bg-[#101725] px-[10px] py-[7px]"
+            >
+              <p className="font-pixel text-[7px] leading-[1.6] text-[#f0ca63]">
+                {item.eyebrow}
+              </p>
+              <p className="mt-[4px] font-pixel text-[7px] leading-[1.7] text-[#e5e7eb]">
+                {item.text}
+              </p>
+            </aside>
+          ))}
+        </div>
+      )}
+
+      {block.callout && (
+        <aside className="mt-[8px] border-l-[4px] border-[#f0ca63] bg-[#101725] px-[11px] py-[8px]">
+          <p className="font-pixel text-[8px] leading-[1.8] text-[#fff3bd]">
+            {block.callout}
+          </p>
+        </aside>
+      )}
+    </article>
+  );
+}
+
+function ReadingView({ sectionIndex, viewedTermIds, onOpenTerm, onContinue }) {
   const readingTitleRef = useRef(null);
-  const allTermsViewed = TERM_IDS.every((id) => viewedTermIds.includes(id));
+  const block = NODE_5_READING_BLOCKS[sectionIndex];
+  const sectionTermIds = SECTION_TERM_IDS[sectionIndex];
+  const sectionTerms = NODE_5_TERMS.filter((term) =>
+    sectionTermIds.includes(term.id),
+  );
+  const allSectionTermsViewed = sectionTermIds.every((id) =>
+    viewedTermIds.includes(id),
+  );
 
   useEffect(() => {
     readingTitleRef.current?.focus();
-  }, []);
+  }, [sectionIndex]);
 
   return (
     <section
       data-stage-interactive
       aria-labelledby="node-5-reading-title"
-      className="absolute inset-[18px] z-20 flex flex-col border-[5px] border-[#f0ca63] bg-[#101725] p-[10px] text-white shadow-[0_8px_0_#080d16,0_12px_24px_#000000b8] ring-4 ring-[#35d8ff]/80"
+      className="absolute inset-[18px] z-20 flex flex-col border-[5px] border-[#f0ca63] bg-[#101725] p-[12px] text-white shadow-[0_8px_0_#080d16,0_12px_24px_#000000b8] ring-4 ring-[#35d8ff]/80"
     >
       <Node5Header
-        step="LECTURA · BLOQUES A + B"
-        stepNumber={1}
-        title="MCP CONECTA · SKILL ORIENTA"
+        step={`LECTURA · SECCIÓN ${block.marker}`}
+        stepNumber={sectionIndex + 1}
+        title={block.title.toUpperCase()}
         titleId="node-5-reading-title"
         titleRef={readingTitleRef}
       />
 
-      <div className="grid min-h-0 flex-1 grid-cols-2 gap-[9px]">
-        {NODE_5_READING_BLOCKS.map((block) => (
-          <article
-            key={block.id}
-            aria-labelledby={`node-5-block-${block.id}-title`}
-            className="flex min-h-0 flex-col border-2 border-[#52616a] bg-[#17263a] p-[9px] shadow-[inset_0_2px_0_#2c4965]"
-          >
-            <header className="flex shrink-0 items-center gap-[8px] border-b border-[#40566d] pb-[7px]">
-              <span className="grid size-[28px] shrink-0 place-items-center border-2 border-[#7a5c2e] bg-[#f0ca63] font-pixel text-[10px] text-[#101725] shadow-[2px_2px_0_#080d16]">
-                {block.marker}
-              </span>
-              <div className="min-w-0">
-                <p className="font-pixel text-[6px] leading-[1.6] text-[#35d8ff]">
-                  {block.eyebrow}
-                </p>
-                <h2
-                  id={`node-5-block-${block.id}-title`}
-                  className="font-pixel text-[7px] leading-[1.7] text-[#fff3bd]"
-                >
-                  {block.title}
-                </h2>
-              </div>
-            </header>
-
-            <p className="mt-[7px] font-pixel text-[7px] leading-[1.8] text-white">
-              {block.text}
-            </p>
-
-            <div
-              role="img"
-              aria-label={
-                block.id === "mcp"
-                  ? "Una aplicación de IA consulta un servidor MCP que expone herramientas y datos"
-                  : "Una Skill presenta sus metadatos primero y carga instrucciones y recursos cuando hacen falta"
-              }
-              className="mt-[7px] grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-[4px] border-2 border-[#40566d] bg-[#101725] px-[6px] py-[6px]"
-            >
-              {block.diagram.map((label, index) => (
-                <span key={label} className="contents">
-                  <span className="grid min-h-[31px] place-items-center border border-[#35d8ff] bg-[#153141] px-[4px] text-center font-pixel text-[5px] leading-[1.5] text-[#c1f4ff]">
-                    {label}
-                  </span>
-                  {index < block.diagram.length - 1 && (
-                    <span aria-hidden="true" className="font-pixel text-[7px] text-[#f0ca63]">
-                      →
-                    </span>
-                  )}
-                </span>
-              ))}
-            </div>
-
-            {block.evidence && (
-              <div className="mt-[7px] grid min-h-0 flex-1 grid-cols-2 gap-[6px]">
-                {block.evidence.map((item) => (
-                  <aside
-                    key={item.eyebrow}
-                    className="border-l-[3px] border-[#f0ca63] bg-[#101725] px-[7px] py-[6px]"
-                  >
-                    <p className="font-pixel text-[5px] leading-[1.5] text-[#f0ca63]">
-                      {item.eyebrow}
-                    </p>
-                    <p className="mt-[3px] font-pixel text-[5px] leading-[1.7] text-[#e5e7eb]">
-                      {item.text}
-                    </p>
-                  </aside>
-                ))}
-              </div>
-            )}
-
-            {block.callout && (
-              <aside className="mt-[7px] flex min-h-0 flex-1 flex-col justify-center border-l-[3px] border-[#f0ca63] bg-[#101725] px-[8px] py-[7px]">
-                <p className="font-pixel text-[5px] leading-[1.7] text-[#e5e7eb]">
-                  {block.callout}
-                </p>
-              </aside>
-            )}
-          </article>
-        ))}
+      <div className="grid min-h-0 flex-1 grid-cols-1">
+        <ReadingBlock block={block} />
       </div>
 
       <div
         role="group"
-        aria-label="Términos clave de la Estación de Conexiones"
-        className="mt-[7px] grid shrink-0 grid-cols-4 gap-[6px]"
+        aria-label={`Conceptos clave de la sección ${block.marker}`}
+        className="mt-[10px] grid shrink-0 grid-cols-2 gap-[10px]"
       >
-        {NODE_5_TERMS.map((term) => (
+        {sectionTerms.map((term) => (
           <TermButton
             key={term.id}
             term={term}
@@ -196,23 +214,27 @@ function ReadingView({ viewedTermIds, onOpenTerm, onBeginQuiz }) {
         ))}
       </div>
 
-      <footer className="mt-[7px] flex min-h-[42px] shrink-0 items-center justify-between gap-[9px] border-t-4 border-[#35d8ff] bg-[#17263a] px-[9px] py-[5px] shadow-[inset_0_2px_0_#2c4965]">
+      <footer className="mt-[10px] flex min-h-[52px] shrink-0 items-center justify-between gap-[12px] border-t-4 border-[#35d8ff] bg-[#17263a] px-[11px] py-[7px] shadow-[inset_0_2px_0_#2c4965]">
         <p
           id="node-5-glossary-status"
           aria-live="polite"
-          className="font-pixel text-[6px] leading-[1.7] text-[#9fe8f4]"
+          className="font-pixel text-[7px] leading-[1.7] text-[#9fe8f4]"
         >
           TÉRMINOS CONSULTADOS: {viewedTermIds.length} / {NODE_5_TERMS.length}
         </p>
         <button
           type="button"
           data-stage-interactive
-          aria-describedby={!allTermsViewed ? "node-5-glossary-status" : undefined}
-          disabled={!allTermsViewed}
-          onClick={onBeginQuiz}
-          className={`min-h-[34px] border-2 border-[#080d16] px-[10px] py-[5px] font-pixel text-[6px] leading-[1.5] shadow-[0_3px_0_#080d16] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${allTermsViewed ? "bg-[#f0ca63] text-[#101725] hover:bg-[#fff3bd] active:translate-y-[2px] active:shadow-[0_1px_0_#080d16]" : "cursor-not-allowed bg-[#59606a] text-[#c8cdd2] opacity-80"}`}
+          aria-describedby={!allSectionTermsViewed ? "node-5-glossary-status" : undefined}
+          disabled={!allSectionTermsViewed}
+          onClick={onContinue}
+          className={`min-h-[42px] border-2 border-[#080d16] px-[13px] py-[7px] font-pixel text-[8px] leading-[1.6] shadow-[0_3px_0_#080d16] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${allSectionTermsViewed ? "bg-[#f0ca63] text-[#101725] hover:bg-[#fff3bd] active:translate-y-[2px] active:shadow-[0_1px_0_#080d16]" : "cursor-not-allowed bg-[#59606a] text-[#c8cdd2] opacity-80"}`}
         >
-          {allTermsViewed ? "IR AL RETO →" : "CONSULTA LOS «+»"}
+          {allSectionTermsViewed
+            ? sectionIndex === 0
+              ? "SIGUIENTE: BLOQUE B →"
+              : "IR AL RETO →"
+            : "CONSULTA LOS «+»"}
         </button>
       </footer>
     </section>
@@ -246,7 +268,7 @@ function QuizView({
     >
       <Node5Header
         step="RETO · EVALUACIÓN"
-        stepNumber={2}
+        stepNumber={3}
         title="RELACIONA CADA CONCEPTO"
         titleId="node-5-quiz-title"
         titleRef={quizTitleRef}
@@ -378,7 +400,7 @@ function SuccessView({ onExit }) {
     >
       <Node5Header
         step="RETO COMPLETADO"
-        stepNumber={2}
+        stepNumber={3}
         title="CONEXIONES ESTABLES"
         titleId="node-5-success-title"
         titleRef={successTitleRef}
@@ -500,6 +522,7 @@ function TermDialog({ term, closeButtonRef, onClose, onBackdropClick }) {
 
 export default function Nodo5({ active, onComplete, onExit }) {
   const [phase, setPhase] = useState("welcome");
+  const [readingSection, setReadingSection] = useState(0);
   const [visibleCharacters, setVisibleCharacters] = useState(0);
   const [talkingFrameIndex, setTalkingFrameIndex] = useState(0);
   const [viewedTermIds, setViewedTermIds] = useState([]);
@@ -537,8 +560,18 @@ export default function Nodo5({ active, onComplete, onExit }) {
       finishTyping();
       return;
     }
+    setReadingSection(0);
     setPhase("reading");
   }, [active, finishTyping, isTyping, phase]);
+
+  const continueReading = useCallback(() => {
+    if (!active || phase !== "reading") return;
+    if (readingSection === 0) {
+      setReadingSection(1);
+      return;
+    }
+    setPhase("quiz");
+  }, [active, phase, readingSection]);
 
   const openTerm = useCallback((termId, event) => {
     termTriggerRef.current = event.currentTarget;
@@ -617,6 +650,7 @@ export default function Nodo5({ active, onComplete, onExit }) {
     if (active) return;
 
     setPhase("welcome");
+    setReadingSection(0);
     setVisibleCharacters(0);
     setTalkingFrameIndex(0);
     setViewedTermIds([]);
@@ -824,9 +858,10 @@ export default function Nodo5({ active, onComplete, onExit }) {
 
       {phase === "reading" && (
         <ReadingView
+          sectionIndex={readingSection}
           viewedTermIds={viewedTermIds}
           onOpenTerm={openTerm}
-          onBeginQuiz={() => setPhase("quiz")}
+          onContinue={continueReading}
         />
       )}
 

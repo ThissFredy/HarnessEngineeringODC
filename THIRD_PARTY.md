@@ -2,11 +2,13 @@
 
 Recursos y herramientas de terceros utilizados por el proyecto. **Todo es open source.**
 
-## Fuentes tipográficas (se empaquetan dentro del SCO)
+## Recursos visuales y fuentes tipográficas (se empaquetan dentro del SCO)
 
 | Recurso | Licencia | Archivo de licencia | Uso |
 |---|---|---|---|
 | [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) (Cody Boisclair) | SIL OFL 1.1 | `src/assets/fonts/OFL-PressStart2P.txt` (viaja dentro de `dist/`) | Tipografía de interfaz |
+| [Pixel bug](https://freesvg.org/pixel-bug), de OpenClipart | CC0 1.0 / dominio público | No requiere atribución ni archivo de licencia | PNG reducido a 128×128 en `src/assets/illustrations/pixel-bug.png`; ilustración del ejemplo de fuzzing del Nodo 4 |
+| [Logotipo de Python, solo isotipo](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg) (fuente indicada: python.org) | Dominio público por geometría simple (CC0); marca comercial de Python Software Foundation | [Política de marcas de PSF](https://www.python.org/psf/trademarks/) (uso nominativo, logo sin alterar y acompañado de ™) | `src/assets/illustrations/python-logo-notext.svg`; identifica el destino Python del ejemplo COBOL → Python |
 | Ilustración retro pixel art de biblioteca y campus (arte original del proyecto) | CC BY 4.0 | `LICENSE-CONTENT.txt` | Fuente SVG `src/assets/backgrounds/inicio.svg`; versión raster pixelada `src/assets/backgrounds/inicio-pixel.png` usada en portada |
 | Mapa Overworld retro pixel art (arte original del proyecto) | CC BY 4.0 | `LICENSE-CONTENT.txt` | Fuente SVG `src/assets/backgrounds/mapa.svg`; versión raster de 768×450 y 80 colores `src/assets/backgrounds/mapa-pixel.png` usada en mapa |
 | Estación de Conexiones (arte original del proyecto) | CC BY 4.0 | `LICENSE-CONTENT.txt` | `src/assets/backgrounds/nodo-5.jpeg` |

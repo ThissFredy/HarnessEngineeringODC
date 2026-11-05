@@ -6,25 +6,28 @@ export const NODE_4_TERMS = [
     id: "react",
     label: "REACT",
     title: "ReAct",
-    body: "Patrón que alterna razonamiento y acción con herramientas: el modelo observa el resultado de una acción y decide cómo continuar (Loose et al., 2026).",
+    body: "El agente alterna razonamiento y acciones; observa el resultado antes de decidir el siguiente paso.",
+    citation: "Loose et al., 2026",
   },
   {
     id: "deterministic-orchestration",
     label: "ORQUESTACIÓN DETERMINISTA",
     title: "Orquestación determinista",
-    body: "El sistema, y no el modelo, fija de antemano el orden de las etapas y las condiciones para avanzar, validar o reintentar (Lwin & Kumar, 2026).",
+    body: "El sistema fija el orden de las etapas y cuándo validar o reintentar.",
+    citation: "Lwin & Kumar, 2026",
   },
   {
     id: "agentic-workflow",
     label: "AGENTIC WORKFLOW",
     title: "Agentic workflow",
-    body: "Coordinación del trabajo de agentes: quién hace qué, en qué orden y qué revisiones comprueban el resultado.",
+    body: "Plan que reparte tareas entre agentes y define el orden y la revisión de resultados.",
   },
   {
     id: "whatscode",
     label: "WHATS CODE",
     title: "WhatsCode",
-    body: "Plataforma de IA para desarrollo en WhatsApp. Evolucionó de RAG a flujos deterministas «agentless» y luego a cuatro capas: tareas, enrutador de flujos, infraestructura LLM y entorno de desarrollo (Mao et al., 2026).",
+    body: "Plataforma para programar desde WhatsApp: evolucionó de RAG a flujos deterministas «agentless».",
+    citation: "Mao et al., 2026",
   },
 ];
 
@@ -38,7 +41,7 @@ export const NODE_4_READING_BLOCKS = [
     flowLabels: ["OBSERVAR", "DECIDIR", "ACTUAR", "OBSERVAR"],
     evidenceEyebrow: "EJEMPLO · FUZZING DE BIBLIOTECAS JAVA",
     evidenceText:
-      "Cinco agentes ReAct se repartieron la investigación, generación del arnés, reparación de compilación, análisis de cobertura y refinamiento (Loose et al., 2026).",
+      "Cinco agentes ReAct investigaron, generaron y repararon el arnés; después midieron y mejoraron su cobertura (Loose et al., 2026).",
   },
   {
     id: "autonomy",
@@ -48,8 +51,9 @@ export const NODE_4_READING_BLOCKS = [
     text: "La secuencia puede fijarla el sistema, decidirla el modelo o combinar autonomía con supervisión humana según el riesgo. No hay que dar la misma autonomía a todas las tareas:",
     evidence: [
       {
-        eyebrow: "A · DETERMINISTA · COBOL → PYTHON",
+        eyebrow: "A · DETERMINISTA · COBOL → PYTHON™",
         text: "Con etapas de validación explícitas, redujo hasta 3,5× los tokens con precisión computacional comparable (Lwin & Kumar, 2026).",
+        logo: "python",
       },
       {
         eyebrow: "B · FLUJO SECUENCIAL · CIBERSEGURIDAD",
